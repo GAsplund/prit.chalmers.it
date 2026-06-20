@@ -1,5 +1,6 @@
 import BottomNavBar from '@/components/BottomNavBar';
 import ToolCard from '@/components/ToolCard';
+import Card from '@/components/Card';
 import type { NavItem } from '@/components/TopAppBar';
 import { MdHome, MdViewInAr, MdLocalBar, MdPerson } from 'react-icons/md';
 import { FaFacebook, FaYoutube } from 'react-icons/fa';
@@ -19,42 +20,20 @@ export default async function HomePage() {
 
   return (
     <>
-      <main
-        className="w-full mx-auto px-md pb-32 pt-[88px]"
-        style={{ maxWidth: 'var(--container-content)' }}
-      >
+      <main className="w-full mx-auto px-md pb-32 pt-nav-height max-w-content">
         <div className="py-gutter flex flex-col gap-md">
           {/* ── Hero card ───────────────────────────────────────────────── */}
-          <section
-            className="rounded-lg p-lg ambient-shadow border border-outline-variant/20 relative overflow-hidden"
-            style={{ background: 'var(--color-surface-container-lowest)' }}
-          >
-            <div className="relative z-10" style={{ maxWidth: '38ch' }}>
+          <Card as="section" size="lg" className="relative overflow-hidden">
+            <div className="relative z-10 max-w-[38ch]">
               <p className="text-label-md mb-2 text-on-surface">
                 Välkommen till
               </p>
 
-              <h1
-                className="mb-4"
-                style={{
-                  fontFamily: 'var(--font-zyzol, var(--font-headline))',
-                  fontSize: 'clamp(2.5rem, 8vw, 4.5rem)',
-                  lineHeight: 1.05,
-                  letterSpacing: '-0.03em',
-                  fontWeight: 700,
-                  color: 'var(--color-on-surface)'
-                }}
-              >
+              <h1 className="mb-4 font-zyzol text-on-surface text-[clamp(2.5rem,8vw,4.5rem)] leading-[1.05] tracking-[-0.03em] font-bold">
                 P.R.I.T.
               </h1>
 
-              <p
-                className="text-body-lg mb-6"
-                style={{
-                  fontFamily: 'var(--font-body)',
-                  color: 'var(--color-on-surface-variant)'
-                }}
-              >
+              <p className="text-body-lg mb-6 font-body text-on-surface-variant">
                 Vi är PR- och rustmästeriet på IT-sektionen vid Chalmers. Vi
                 arrangerar olika arr, ansvarar för sektionens pubrundor och
                 håller Hubben 2.2 levande.
@@ -63,14 +42,7 @@ export default async function HomePage() {
               <div className="flex flex-wrap items-center gap-sm">
                 <Link
                   href="/members"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-label-md transition-all ambient-shadow-hover"
-                  style={{
-                    background:
-                      'linear-gradient(135deg, var(--color-primary-container), var(--color-secondary-fixed-dim))',
-                    color: 'var(--color-on-primary-container)',
-                    fontFamily: 'var(--font-body)',
-                    fontWeight: 600
-                  }}
+                  className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-label-md transition-all ambient-shadow-hover bg-gradient-brand-dim text-on-primary-container font-semibold"
                 >
                   <MdPerson size={18} />
                   Sittande och pateter
@@ -80,11 +52,7 @@ export default async function HomePage() {
                   href="https://www.facebook.com/PRITChalmers"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 rounded-full flex items-center justify-center transition-all ambient-shadow-hover"
-                  style={{
-                    background: 'var(--color-surface-container)',
-                    color: 'var(--color-on-surface-variant)'
-                  }}
+                  className="w-11 h-11 rounded-full flex items-center justify-center transition-all ambient-shadow-hover bg-surface-container text-on-surface-variant"
                   aria-label="Facebook"
                 >
                   <FaFacebook size={18} />
@@ -94,41 +62,19 @@ export default async function HomePage() {
                   href="https://www.youtube.com/@prit_it"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-11 h-11 rounded-full flex items-center justify-center transition-all ambient-shadow-hover"
-                  style={{
-                    background: 'var(--color-surface-container)',
-                    color: 'var(--color-on-surface-variant)'
-                  }}
+                  className="w-11 h-11 rounded-full flex items-center justify-center transition-all ambient-shadow-hover bg-surface-container text-on-surface-variant"
                   aria-label="YouTube"
                 >
                   <FaYoutube size={20} />
                 </a>
               </div>
             </div>
-          </section>
+          </Card>
 
           {/* ── Verktyg ─────────────────────────────────────────────────── */}
-          <section
-            className="rounded-lg p-lg ambient-shadow border border-outline-variant/20"
-            style={{ background: 'var(--color-surface-container-lowest)' }}
-          >
-            <h2
-              className="text-headline-md mb-sm"
-              style={{
-                fontFamily: 'var(--font-headline)',
-                color: 'var(--color-on-surface)'
-              }}
-            >
-              Verktyg
-            </h2>
-            <p
-              className="text-body-md mb-md"
-              style={{
-                fontFamily: 'var(--font-body)',
-                color: 'var(--color-on-surface-variant)',
-                maxWidth: '60ch'
-              }}
-            >
+          <Card as="section" size="lg">
+            <h2 className="text-headline-md mb-sm text-on-surface">Verktyg</h2>
+            <p className="text-body-md mb-md font-body text-on-surface-variant max-w-[60ch]">
               Praktiska hjälpmedel för oss i P.R.I.T. och för sektionens
               medlemmar.
             </p>
@@ -149,7 +95,7 @@ export default async function HomePage() {
                 locked={!isLoggedIn}
               />
             </div>
-          </section>
+          </Card>
         </div>
       </main>
 

@@ -42,13 +42,7 @@ export default function UserButton({ user }: { user?: User | null }) {
             providerId: 'gamma'
           });
         }}
-        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-label-md transition-all ambient-shadow-hover"
-        style={{
-          background: 'var(--color-surface-container)',
-          color: 'var(--color-on-surface-variant)',
-          fontFamily: 'var(--font-body)',
-          fontWeight: 600
-        }}
+        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-label-md transition-all ambient-shadow-hover bg-surface-container text-on-surface-variant font-semibold"
       >
         <MdLogin size={16} />
         Logga in
@@ -63,13 +57,7 @@ export default function UserButton({ user }: { user?: User | null }) {
         onClick={() => setOpen((o) => !o)}
         aria-label="Användarmeny"
         aria-expanded={open}
-        className="w-9 h-9 rounded-full flex items-center justify-center text-label-sm font-bold transition-all ambient-shadow-hover"
-        style={{
-          background:
-            'linear-gradient(135deg, var(--color-primary-container), var(--color-secondary-fixed-dim))',
-          color: 'var(--color-on-primary-container)',
-          fontFamily: 'var(--font-body)'
-        }}
+        className="w-9 h-9 rounded-full flex items-center justify-center text-label-sm font-bold transition-all ambient-shadow-hover bg-gradient-brand-dim text-on-primary-container"
       >
         <img
           src={
@@ -82,20 +70,13 @@ export default function UserButton({ user }: { user?: User | null }) {
       </button>
 
       {open && (
-        <div
-          className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-outline-variant/20 py-1 z-50 ambient-shadow"
-          style={{ background: 'var(--color-surface-container-lowest)' }}
-        >
+        <div className="absolute right-0 top-full mt-2 w-48 rounded-xl border border-outline-variant/20 py-1 z-50 ambient-shadow bg-surface-container-lowest">
           <button
             onClick={async () => {
               await authClient.signOut();
               router.refresh();
             }}
-            className="w-full flex items-center gap-2 px-4 py-2 text-label-md transition-colors hover:opacity-80"
-            style={{
-              color: 'var(--color-on-surface-variant)',
-              fontFamily: 'var(--font-body)'
-            }}
+            className="w-full flex items-center gap-2 px-4 py-2 text-label-md transition-colors hover:opacity-80 text-on-surface-variant"
           >
             <MdLogout size={16} />
             Logga ut

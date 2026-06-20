@@ -1,6 +1,7 @@
 import TopAppBar from '@/components/TopAppBar';
 import BottomNavBar from '@/components/BottomNavBar';
 import EventCard from '@/components/EventCard';
+import Card from '@/components/Card';
 import type { NavItem } from '@/components/TopAppBar';
 import {
   MdHome,
@@ -56,94 +57,47 @@ export default async function PubCrawlPage() {
     <>
       <TopAppBar />
 
-      <main
-        className="w-full mx-auto px-md pb-32 pt-[88px]"
-        style={{ maxWidth: 'var(--container-content)' }}
-      >
+      <main className="w-full mx-auto px-md pb-32 pt-nav-height max-w-content">
         <div className="py-gutter flex flex-col gap-md">
           {/* Page header card */}
-          <section
-            className="rounded-lg p-lg ambient-shadow border border-outline-variant/20"
-            style={{ background: 'var(--color-surface-container-lowest)' }}
-          >
-            <h1
-              className="text-headline-xl"
-              style={{
-                fontFamily: 'var(--font-headline)',
-                color: 'var(--color-on-surface)'
-              }}
-            >
-              Pubrunda
-            </h1>
-            <p
-              className="mt-2 text-body-lg"
-              style={{
-                fontFamily: 'var(--font-body)',
-                color: 'var(--color-on-surface-variant)'
-              }}
-            >
+          <Card as="section" size="lg">
+            <h1 className="text-headline-xl text-on-surface">Pubrunda</h1>
+            <p className="mt-2 text-body-lg font-body text-on-surface-variant">
               Hantera ekonomi och schema för kommande evenemang.
             </p>
-          </section>
+          </Card>
 
           {/* Ongoing event */}
-          <Link
+          <Card
+            as={Link}
             href="/pub-crawl/1"
-            className="group rounded-lg p-lg ambient-shadow border border-outline-variant/20 hover:ambient-shadow-hover"
-            style={{ background: 'var(--color-tertiary-container)' }}
+            variant="tertiary"
+            size="lg"
+            className="group hover:ambient-shadow-hover"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <MdEditCalendar
                   size={28}
-                  style={{ color: 'var(--color-on-tertiary-container)' }}
+                  className="text-on-tertiary-container"
                 />
-                <h2
-                  className="text-headline-md"
-                  style={{
-                    fontFamily: 'var(--font-headline)',
-                    color: 'var(--color-on-tertiary-container)'
-                  }}
-                >
+                <h2 className="text-headline-md text-on-tertiary-container">
                   Pågående pubrunda
                 </h2>
               </div>
-              <span
-                className="text-label-md px-3 py-1 rounded-full"
-                style={{
-                  background: 'var(--color-on-tertiary-container)',
-                  color: 'var(--color-tertiary-container)',
-                  opacity: 0.8
-                }}
-              >
+              <span className="text-label-md px-3 py-1 rounded-full opacity-80 bg-on-tertiary-container text-tertiary-container">
                 Aktiv
               </span>
             </div>
-          </Link>
+          </Card>
 
           {/* Schedule section card */}
-          <section
-            className="rounded-lg p-lg ambient-shadow border border-outline-variant/20"
-            style={{ background: 'var(--color-surface-container-lowest)' }}
-          >
+          <Card as="section" size="lg">
             <div className="flex justify-between items-center mb-6">
-              <h2
-                className="text-headline-md"
-                style={{
-                  fontFamily: 'var(--font-headline)',
-                  color: 'var(--color-on-surface)'
-                }}
-              >
+              <h2 className="text-headline-md text-on-surface">
                 Kommande pubrundor
               </h2>
-              <button
-                className="flex items-center gap-2 px-5 py-2.5 rounded-full ambient-shadow-hover transition-all text-label-md"
-                style={{
-                  background: 'var(--color-primary)',
-                  color: 'var(--color-on-primary)',
-                  fontFamily: 'var(--font-body)'
-                }}
-              >
+              <button className="flex items-center gap-2 px-5 py-2.5 rounded-full ambient-shadow-hover transition-all text-label-md bg-primary text-on-primary">
                 <MdAdd size={20} />
                 Nytt Event
               </button>
@@ -154,7 +108,7 @@ export default async function PubCrawlPage() {
                 <EventCard key={e.id} {...e} />
               ))}
             </div>
-          </section>
+          </Card>
         </div>
       </main>
 

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import type { IconType } from 'react-icons';
 import { MdArrowForward, MdLock } from 'react-icons/md';
+import Card from './Card';
 
 export interface ToolCardProps {
   href: string;
@@ -22,23 +23,9 @@ export default function ToolCard({
   featured = false
 }: ToolCardProps) {
   const inner = (
-    <div
-      className={[
-        'group relative flex flex-col justify-between gap-md p-md rounded-xl border ambient-shadow-hover h-full',
-        featured ? 'overflow-hidden' : 'border-outline-variant/20'
-      ].join(' ')}
-      style={
-        featured
-          ? {
-              background:
-                'linear-gradient(135deg, var(--color-primary-container), var(--color-secondary-fixed))',
-              borderColor: 'transparent',
-              color: 'var(--color-on-primary-container)'
-            }
-          : {
-              background: 'var(--color-surface-container-low)'
-            }
-      }
+    <Card
+      variant={featured ? 'gradient' : 'surface'}
+      className="group relative flex flex-col justify-between gap-md h-full"
     >
       {/* Decorative large background icon for featured */}
       {featured && (
@@ -50,27 +37,18 @@ export default function ToolCard({
       {/* Top row: icon bubble + optional lock badge */}
       <div className="flex items-start justify-between relative z-10">
         <div
-          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{
-            background: featured
-              ? 'color-mix(in srgb, var(--color-on-primary-container) 12%, transparent)'
-              : 'var(--color-surface-container)',
-            color: featured
-              ? 'var(--color-on-primary-container)'
-              : 'var(--color-primary)'
-          }}
+          className={[
+            'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
+            featured
+              ? 'bg-icon-featured text-on-primary-container'
+              : 'bg-surface-container text-primary'
+          ].join(' ')}
         >
           <Icon size={20} />
         </div>
 
         {locked && (
-          <span
-            className="flex items-center gap-1 px-2.5 py-1 rounded-full text-label-sm"
-            style={{
-              background: 'var(--color-surface-container)',
-              color: 'var(--color-on-surface-variant)'
-            }}
-          >
+          <span className="flex items-center gap-1 px-2.5 py-1 rounded-full text-label-sm bg-surface-container text-on-surface-variant">
             <MdLock size={13} />
             Inloggning
           </span>
@@ -80,24 +58,20 @@ export default function ToolCard({
       {/* Text */}
       <div className="relative z-10">
         <h3
-          className="mb-1 text-headline-md"
-          style={{
-            fontFamily: 'var(--font-headline)',
-            color: featured
-              ? 'var(--color-on-primary-container)'
-              : 'var(--color-on-surface)'
-          }}
+          className={[
+            'mb-1 text-headline-md',
+            featured ? 'text-on-primary-container' : 'text-on-surface'
+          ].join(' ')}
         >
           {title}
         </h3>
         <p
-          className="text-body-md"
-          style={{
-            fontFamily: 'var(--font-body)',
-            color: featured
-              ? 'color-mix(in srgb, var(--color-on-primary-container) 80%, transparent)'
-              : 'var(--color-on-surface-variant)'
-          }}
+          className={[
+            'text-body-md font-body',
+            featured
+              ? 'text-on-primary-container opacity-80'
+              : 'text-on-surface-variant'
+          ].join(' ')}
         >
           {description}
         </p>
@@ -111,15 +85,11 @@ export default function ToolCard({
         >
           <MdArrowForward
             size={22}
-            style={{
-              color: featured
-                ? 'var(--color-on-primary-container)'
-                : 'var(--color-primary)'
-            }}
+            className={featured ? 'text-on-primary-container' : 'text-primary'}
           />
         </div>
       )}
-    </div>
+    </Card>
   );
 
   return locked ? (

@@ -21,11 +21,7 @@ export default function ThemeToggle() {
     <button
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       aria-label={isDark ? 'Byt till ljust läge' : 'Byt till mörkt läge'}
-      className="w-9 h-9 rounded-full flex items-center justify-center transition-colors ambient-shadow-hover"
-      style={{
-        background: 'var(--color-surface-container)',
-        color: 'var(--color-on-surface-variant)'
-      }}
+      className="w-9 h-9 rounded-full flex items-center justify-center transition-colors ambient-shadow-hover bg-surface-container text-on-surface-variant"
     >
       {isDark ? <MdLightMode size={18} /> : <MdDarkMode size={18} />}
     </button>

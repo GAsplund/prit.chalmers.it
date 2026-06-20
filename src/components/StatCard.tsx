@@ -1,4 +1,5 @@
 import type { IconType } from 'react-icons';
+import Card from './Card';
 
 export interface StatCardProps {
   Icon: IconType;
@@ -17,33 +18,17 @@ export default function StatCard({
 }: StatCardProps) {
   if (highlight) {
     return (
-      <div
-        className="rounded-xl p-md ambient-shadow flex flex-col justify-between relative overflow-hidden"
-        style={{
-          background:
-            'linear-gradient(135deg, var(--color-primary-container), var(--color-secondary-fixed))',
-          color: 'var(--color-on-primary-container)'
-        }}
+      <Card
+        variant="gradient"
+        className="flex flex-col justify-between relative"
       >
         {/* Header row */}
         <div className="flex justify-between items-start mb-6 relative z-10">
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 backdrop-blur-sm"
-            style={{
-              background:
-                'color-mix(in srgb, var(--color-on-primary-container) 10%, transparent)'
-            }}
-          >
+          <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 backdrop-blur-sm bg-icon-highlight">
             <Icon size={20} />
           </div>
           {tag && (
-            <span
-              className="text-label-sm px-3 py-1 rounded-full"
-              style={{
-                background: 'var(--color-on-primary-container)',
-                color: 'var(--color-primary-container)'
-              }}
-            >
+            <span className="text-label-sm px-3 py-1 rounded-full bg-on-primary-container text-primary-container">
               {tag}
             </span>
           )}
@@ -51,85 +36,32 @@ export default function StatCard({
 
         {/* Value */}
         <div className="relative z-10">
-          <h2
-            className="font-black"
-            style={{
-              fontFamily: 'var(--font-headline)',
-              fontSize: 'var(--text-headline-xl)',
-              lineHeight: 'var(--text-headline-xl--line-height)',
-              letterSpacing: 'var(--text-headline-xl--letter-spacing)',
-              fontWeight: 'var(--text-headline-xl--font-weight)'
-            }}
-          >
-            {value}
-          </h2>
-          <p
-            className="opacity-90 font-semibold mt-1"
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: 'var(--text-body-lg)',
-              lineHeight: 'var(--text-body-lg--line-height)'
-            }}
-          >
+          <h2 className="font-black text-headline-xl">{value}</h2>
+          <p className="opacity-90 font-semibold mt-1 text-body-lg">
             {description}
           </p>
         </div>
-      </div>
+      </Card>
     );
   }
 
   return (
-    <div
-      className="rounded-xl p-md ambient-shadow flex flex-col justify-between border border-outline-variant/20"
-      style={{ background: 'var(--color-surface-container-lowest)' }}
-    >
+    <Card className="flex flex-col justify-between">
       {/* Header row */}
       <div className="flex justify-between items-start mb-6">
-        <div
-          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{
-            background: 'var(--color-surface-container)',
-            color: 'var(--color-secondary)'
-          }}
-        >
+        <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-surface-container text-secondary">
           <Icon size={20} />
         </div>
-        <span
-          className="text-label-sm px-3 py-1 rounded-full"
-          style={{
-            background: 'var(--color-secondary-container)',
-            color: 'var(--color-on-secondary-container)'
-          }}
-        >
+        <span className="text-label-sm px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container">
           {tag}
         </span>
       </div>
 
       {/* Value */}
       <div>
-        <h2
-          style={{
-            fontFamily: 'var(--font-headline)',
-            fontSize: 'var(--text-headline-lg)',
-            lineHeight: 'var(--text-headline-lg--line-height)',
-            letterSpacing: 'var(--text-headline-lg--letter-spacing)',
-            fontWeight: 'var(--text-headline-lg--font-weight)',
-            color: 'var(--color-on-surface)'
-          }}
-        >
-          {value}
-        </h2>
-        <p
-          style={{
-            fontFamily: 'var(--font-body)',
-            fontSize: 'var(--text-body-md)',
-            lineHeight: 'var(--text-body-md--line-height)',
-            color: 'var(--color-outline)'
-          }}
-        >
-          {description}
-        </p>
+        <h2 className="text-headline-lg text-on-surface">{value}</h2>
+        <p className="text-body-md text-outline">{description}</p>
       </div>
-    </div>
+    </Card>
   );
 }
