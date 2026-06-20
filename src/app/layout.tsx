@@ -7,8 +7,8 @@ import TopAppBar from '@/components/TopAppBar';
 
 const zyzol = localFont({
   src: [
-    { path: './fonts/Zyzol.otf', weight: '400', style: 'normal' },
-    { path: './fonts/Zyzol-Bold.otf', weight: '700', style: 'normal' }
+    { path: '../fonts/Zyzol.otf', weight: '400', style: 'normal' },
+    { path: '../fonts/Zyzol-Bold.otf', weight: '700', style: 'normal' }
   ],
   variable: '--font-zyzol'
 });
