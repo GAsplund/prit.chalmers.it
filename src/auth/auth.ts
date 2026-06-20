@@ -15,11 +15,20 @@ export const auth = betterAuth({
           scopes: ['openid', 'profile'],
           mapProfileToUser: async (profile) => {
             return {
-              email: profile.id + '@chalmers-fake.it'
+              email: profile.id + '@chalmers-fake.it',
+              externalId: profile.id
             };
           }
         }
       ]
     })
-  ]
+  ],
+  user: {
+    additionalFields: {
+      externalId: {
+        type: 'string',
+        required: false
+      }
+    }
+  }
 });

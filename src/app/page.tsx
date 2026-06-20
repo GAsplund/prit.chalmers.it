@@ -4,6 +4,7 @@ import type { NavItem } from '@/components/TopAppBar';
 import { MdHome, MdViewInAr, MdLocalBar, MdPerson } from 'react-icons/md';
 import { FaFacebook, FaYoutube } from 'react-icons/fa';
 import Link from 'next/link';
+import UserService from '@/services/userService';
 
 const navItems: NavItem[] = [
   { href: '/', Icon: MdHome, label: 'Hem', active: true },
@@ -12,7 +13,10 @@ const navItems: NavItem[] = [
   { href: '/members', Icon: MdPerson, label: 'Medlemmar' }
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const isLoggedIn = !!(await UserService.getUser());
+  const isPRIT = await UserService.getIsPRIT();
+
   return (
     <>
       <main
@@ -135,14 +139,14 @@ export default function HomePage() {
                 Icon={MdLocalBar}
                 title="Pubrunda"
                 description="Planera rutten, håll koll på ekonomin och koordinera deltagarna under en pubrunda."
-                locked
+                locked={!isPRIT}
               />
               <ToolCard
                 href="/hubben"
                 Icon={MdViewInAr}
                 title="Hubben 2.2 i 3D"
                 description="Utforska sektionslokalen i en interaktiv 3D-modell."
-                locked
+                locked={!isLoggedIn}
               />
             </div>
           </section>

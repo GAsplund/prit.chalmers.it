@@ -11,6 +11,9 @@ import {
   MdViewInAr
 } from 'react-icons/md';
 import Link from 'next/link';
+import UserService from '@/services/userService';
+import UnauthorizedPage from '@/components/ErrorPages/401';
+import ForbiddenPage from '@/components/ErrorPages/403';
 
 const navItems: NavItem[] = [
   { href: '/', Icon: MdHome, label: 'Hem' },
@@ -38,7 +41,17 @@ const events = [
   }
 ];
 
-export default function PubCrawlPage() {
+export default async function PubCrawlPage() {
+  const user = await UserService.getUser();
+  if (!user) {
+    return <UnauthorizedPage />;
+  }
+
+  const isPRIT = await UserService.getIsPRIT();
+  if (!isPRIT) {
+    return <ForbiddenPage />;
+  }
+
   return (
     <>
       <TopAppBar />

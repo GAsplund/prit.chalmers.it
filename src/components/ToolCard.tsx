@@ -104,23 +104,27 @@ export default function ToolCard({
       </div>
 
       {/* Arrow — appears on hover */}
-      <div
-        className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity z-10"
-        aria-hidden
-      >
-        <MdArrowForward
-          size={22}
-          style={{
-            color: featured
-              ? 'var(--color-on-primary-container)'
-              : 'var(--color-primary)'
-          }}
-        />
-      </div>
+      {!locked && (
+        <div
+          className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+          aria-hidden
+        >
+          <MdArrowForward
+            size={22}
+            style={{
+              color: featured
+                ? 'var(--color-on-primary-container)'
+                : 'var(--color-primary)'
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 
-  return (
+  return locked ? (
+    inner
+  ) : (
     <Link href={href} className="block h-full">
       {inner}
     </Link>

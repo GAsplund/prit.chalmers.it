@@ -2,6 +2,8 @@ import TopAppBar from '@/components/TopAppBar';
 import BottomNavBar from '@/components/BottomNavBar';
 import type { NavItem } from '@/components/TopAppBar';
 import { MdHome, MdViewInAr, MdLocalBar, MdPerson } from 'react-icons/md';
+import UserService from '@/services/userService';
+import UnauthorizedPage from '@/components/ErrorPages/401';
 
 const navItems: NavItem[] = [
   { href: '/', Icon: MdHome, label: 'Hem' },
@@ -10,7 +12,12 @@ const navItems: NavItem[] = [
   { href: '/members', Icon: MdPerson, label: 'Medlemmar' }
 ];
 
-export default function PubCrawlPage() {
+export default async function PubCrawlPage() {
+  const isLoggedIn = !!(await UserService.getUser());
+  if (!isLoggedIn) {
+    return <UnauthorizedPage />;
+  }
+
   return (
     <>
       <TopAppBar />

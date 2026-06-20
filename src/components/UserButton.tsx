@@ -15,7 +15,7 @@ interface User {
   image?: string | null | undefined;
 }
 
-export default function UserButton({ user }: { user?: User }) {
+export default function UserButton({ user }: { user?: User | null }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();

@@ -2,8 +2,7 @@ import Link from 'next/link';
 import type { IconType } from 'react-icons';
 import ThemeToggle from './ThemeToggle';
 import UserButton from './UserButton';
-import { auth } from '@/auth/auth';
-import { headers } from 'next/headers';
+import UserService from '@/services/userService';
 
 export interface NavItem {
   href: string;
@@ -13,11 +12,7 @@ export interface NavItem {
 }
 
 export default async function TopAppBar() {
-  const user = (
-    await auth.api.getSession({
-      headers: await headers() // you need to pass the headers object.
-    })
-  )?.user;
+  const user = await UserService.getUser();
 
   return (
     <nav
