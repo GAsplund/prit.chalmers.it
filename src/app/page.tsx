@@ -3,7 +3,7 @@ import ToolCard from '@/components/ToolCard';
 import Card from '@/components/Card';
 import type { NavItem } from '@/components/TopAppBar';
 import { MdHome, MdViewInAr, MdLocalBar, MdPerson } from 'react-icons/md';
-import { FaFacebook, FaYoutube } from 'react-icons/fa';
+import { FaFacebook, FaInstagram, FaYoutube } from 'react-icons/fa';
 import Link from 'next/link';
 import UserService from '@/services/userService';
 
@@ -48,7 +48,17 @@ export default async function HomePage() {
                   Sittande och pateter
                 </Link>
 
-                <a
+                { process.env.INSTAGRAM_URL && <Link
+                  href={process.env.INSTAGRAM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-11 h-11 rounded-full flex items-center justify-center transition-all ambient-shadow-hover bg-surface-container text-on-surface-variant"
+                  aria-label="Instagram"
+                >
+                  <FaInstagram size={20} />
+                </Link> }
+
+                <Link
                   href="https://www.facebook.com/PRITChalmers"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -56,9 +66,9 @@ export default async function HomePage() {
                   aria-label="Facebook"
                 >
                   <FaFacebook size={18} />
-                </a>
+                </Link>
 
-                <a
+                <Link
                   href="https://www.youtube.com/@prit_it"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -66,7 +76,7 @@ export default async function HomePage() {
                   aria-label="YouTube"
                 >
                   <FaYoutube size={20} />
-                </a>
+                </Link>
               </div>
             </div>
           </Card>
