@@ -13,7 +13,7 @@ type CardProps<T extends ElementType = 'div'> = {
 const variantClasses: Record<CardVariant, string> = {
   surface: 'bg-surface-container-lowest border border-outline-variant/20',
   gradient:
-    'bg-gradient-brand border-transparent text-on-primary-container overflow-hidden',
+    'bg-primary-container border-transparent text-on-primary-container overflow-hidden',
   tertiary:
     'bg-tertiary-container border border-outline-variant/20 text-on-tertiary-container'
 };

@@ -42,7 +42,7 @@ export default function UserButton({ user }: { user?: User | null }) {
             providerId: 'gamma'
           });
         }}
-        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-label-md transition-all ambient-shadow-hover bg-surface-container text-on-surface-variant font-semibold"
+        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-label-md transition-all bg-surface-container text-on-surface-variant font-semibold"
       >
         <MdLogin size={16} />
         Logga in
@@ -57,7 +57,7 @@ export default function UserButton({ user }: { user?: User | null }) {
         onClick={() => setOpen((o) => !o)}
         aria-label="Användarmeny"
         aria-expanded={open}
-        className="w-9 h-9 rounded-full flex items-center justify-center text-label-sm font-bold transition-all ambient-shadow-hover bg-gradient-brand-dim text-on-primary-container"
+        className="w-9 h-9 rounded-full flex items-center justify-center text-label-sm font-bold transition-all bg-primary-container text-on-primary-container"
       >
         <img
           src={

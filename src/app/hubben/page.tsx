@@ -1,4 +1,3 @@
-import TopAppBar from '@/components/TopAppBar';
 import BottomNavBar from '@/components/BottomNavBar';
 import Card from '@/components/Card';
 import type { NavItem } from '@/components/TopAppBar';
@@ -21,8 +20,6 @@ export default async function PubCrawlPage() {
 
   return (
     <>
-      <TopAppBar />
-
       <main className="w-full mx-auto px-md pb-32 pt-nav-height max-w-content">
         <div className="py-gutter flex flex-col gap-md">
           {/* Page header card */}

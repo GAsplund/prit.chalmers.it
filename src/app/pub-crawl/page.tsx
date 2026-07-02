@@ -1,20 +1,21 @@
-import TopAppBar from '@/components/TopAppBar';
 import BottomNavBar from '@/components/BottomNavBar';
-import EventCard from '@/components/EventCard';
 import Card from '@/components/Card';
+import EventList from '@/components/ui/EventList';
 import type { NavItem } from '@/components/TopAppBar';
 import {
   MdHome,
-  MdEditCalendar,
   MdAdd,
   MdPerson,
   MdLocalBar,
-  MdViewInAr
+  MdViewInAr,
+  MdArrowForward,
+  MdArrowBack
 } from 'react-icons/md';
 import Link from 'next/link';
 import UserService from '@/services/userService';
 import UnauthorizedPage from '@/components/ErrorPages/401';
 import ForbiddenPage from '@/components/ErrorPages/403';
+import { MOCK_EVENTS } from '@/types/pub-crawl';
 
 const navItems: NavItem[] = [
   { href: '/', Icon: MdHome, label: 'Hem' },
@@ -23,93 +24,90 @@ const navItems: NavItem[] = [
   { href: '/members', Icon: MdPerson, label: 'Medlemmar' }
 ];
 
-const events = [
-  {
-    day: 24,
-    month: 'Okt',
-    title: 'Höstpubrunda',
-    time: '18:00 - 02:00',
-    upcoming: true,
-    id: '1'
-  },
-  {
-    day: 12,
-    month: 'Nov',
-    title: 'Städdag Hubben',
-    time: '10:00 - 15:00',
-    upcoming: false,
-    id: '2'
-  }
-];
+function formatEventDate(dateStr: string): string {
+  const [year, month, day] = dateStr.split('-').map(Number);
+  const s = new Date(year, month - 1, day).toLocaleDateString('sv-SE', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long'
+  });
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
 
 export default async function PubCrawlPage() {
   const user = await UserService.getUser();
-  if (!user) {
-    return <UnauthorizedPage />;
-  }
+  if (!user) return <UnauthorizedPage />;
 
   const isPRIT = await UserService.getIsPRIT();
-  if (!isPRIT) {
-    return <ForbiddenPage />;
-  }
+  if (!isPRIT) return <ForbiddenPage />;
+
+  const activeEvent = MOCK_EVENTS.find((e) => e.upcoming);
 
   return (
     <>
-      <TopAppBar />
-
-      <main className="w-full mx-auto px-md pb-32 pt-nav-height max-w-content">
-        <div className="py-gutter flex flex-col gap-md">
-          {/* Page header card */}
-          <Card as="section" size="lg">
-            <h1 className="text-headline-xl text-on-surface">Pubrunda</h1>
-            <p className="mt-2 text-body-lg font-body text-on-surface-variant">
-              Hantera ekonomi och schema för kommande evenemang.
-            </p>
-          </Card>
-
-          {/* Ongoing event */}
+      <main className="w-full mx-auto px-md pb-32 pt-[88px] content-container">
+        {/* Ongoing event banner */}
+        {activeEvent && (
           <Card
             as={Link}
-            href="/pub-crawl/1"
-            variant="tertiary"
-            size="lg"
-            className="group hover:ambient-shadow-hover"
+            href={`/pub-crawl/${activeEvent.id}`}
+            variant="gradient"
+            size="md"
+            className="block group mb-md"
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <MdEditCalendar
-                  size={28}
-                  className="text-on-tertiary-container"
-                />
-                <h2 className="text-headline-md text-on-tertiary-container">
-                  Pågående pubrunda
-                </h2>
+            <div className="flex items-center justify-between gap-4">
+              {/* Icon + text */}
+              <div className="flex items-center gap-4 min-w-0">
+                <div className="w-14 h-14 rounded-xl flex items-center justify-center bg-on-primary-container/10 flex-shrink-0">
+                  <MdLocalBar size={26} className="text-on-primary-container" />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="w-2 h-2 rounded-full bg-on-primary-container animate-pulse flex-shrink-0" />
+                    <span className="text-label-sm text-on-primary-container/70 uppercase tracking-wider">
+                      Pågår nu
+                    </span>
+                  </div>
+                  <h2 className="text-headline-md text-on-primary-container truncate">
+                    {activeEvent.title}
+                  </h2>
+                  <p className="mt-0.5 text-label-md text-on-primary-container/70">
+                    {formatEventDate(activeEvent.date)}
+                  </p>
+                </div>
               </div>
-              <span className="text-label-md px-3 py-1 rounded-full opacity-80 bg-on-tertiary-container text-tertiary-container">
-                Aktiv
-              </span>
+              {/* Navigation arrow */}
+              <MdArrowForward
+                size={24}
+                className="text-on-primary-container/60 flex-shrink-0 transition-transform group-hover:translate-x-1.5"
+              />
             </div>
           </Card>
+        )}
 
-          {/* Schedule section card */}
-          <Card as="section" size="lg">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-headline-md text-on-surface">
-                Kommande pubrundor
-              </h2>
-              <button className="flex items-center gap-2 px-5 py-2.5 rounded-full ambient-shadow-hover transition-all text-label-md bg-primary text-on-primary">
-                <MdAdd size={20} />
-                Nytt Event
-              </button>
+        {/* Events section */}
+        <Card as="section" size="lg">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <Link
+                href="/"
+                className="flex items-center gap-2 text-label-md text-on-surface-variant hover:text-primary transition-colors w-fit mb-sm"
+              >
+                <MdArrowBack size={18} />
+                Tillbaka till hem
+              </Link>
+              <h1 className="text-headline-xl text-on-surface">Pubrunda</h1>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-md">
-              {events.map((e) => (
-                <EventCard key={e.id} {...e} />
-              ))}
-            </div>
-          </Card>
-        </div>
+            <Link
+              href="/pub-crawl/new"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full text-label-md bg-primary text-on-primary hover:opacity-90 transition-opacity flex-shrink-0"
+            >
+              <MdAdd size={20} />
+              Nytt event
+            </Link>
+          </div>
+          <EventList events={MOCK_EVENTS} />
+        </Card>
       </main>
 
       <BottomNavBar items={navItems} />

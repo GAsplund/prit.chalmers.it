@@ -1,4 +1,3 @@
-import TopAppBar from '@/components/TopAppBar';
 import BottomNavBar from '@/components/BottomNavBar';
 import StatCard from '@/components/StatCard';
 import Card from '@/components/Card';
@@ -13,11 +12,14 @@ import {
   MdCalendarToday,
   MdPerson,
   MdLocalBar,
-  MdViewInAr
+  MdViewInAr,
+  MdEdit,
+  MdArrowBack
 } from 'react-icons/md';
 import UserService from '@/services/userService';
 import UnauthorizedPage from '@/components/ErrorPages/401';
 import ForbiddenPage from '@/components/ErrorPages/403';
+import Link from 'next/link';
 
 const navItems: NavItem[] = [
   { href: '/', Icon: MdHome, label: 'Hem' },
@@ -33,7 +35,13 @@ const stat = {
   highlight: true
 };
 
-export default async function PubCrawlPage() {
+export default async function PubCrawlPage({
+  params
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
   const user = await UserService.getUser();
   if (!user) {
     return <UnauthorizedPage />;
@@ -46,15 +54,31 @@ export default async function PubCrawlPage() {
 
   return (
     <>
-      <TopAppBar />
-
       <main className="w-full mx-auto px-md pb-32 pt-nav-height max-w-content">
         <div className="py-gutter flex flex-col gap-md">
           {/* Page header card with event schedule */}
           <Card as="section" size="lg" className="relative overflow-hidden">
-            <h1 className="text-headline-xl mb-lg relative z-10 text-on-surface">
-              Pubrunda LP1 2026
-            </h1>
+            <div className="flex justify-between items-start mb-lg">
+              <div>
+                <Link
+                  href="/pub-crawl"
+                  className="flex items-center gap-2 text-label-md text-on-surface-variant hover:text-primary transition-colors w-fit mb-sm"
+                >
+                  <MdArrowBack size={18} />
+                  Tillbaka till pubrundor
+                </Link>
+                <h1 className="text-headline-xl relative z-10 text-on-surface">
+                  Pubrunda LP1 2026
+                </h1>
+              </div>
+              <Link
+                href={`/pub-crawl/${id}/edit`}
+                className="flex items-center gap-2 px-5 px-6 py-2.5 rounded-full text-label-md bg-primary text-on-primary hover:opacity-90 transition-opacity"
+              >
+                <MdEdit size={20} />
+                Redigera
+              </Link>
+            </div>
 
             {/* Timeline */}
             <div className="relative mt-8 mb-4 z-10">
@@ -86,7 +110,7 @@ export default async function PubCrawlPage() {
 
                 {/* Timeline Item 2 — Active */}
                 <div className="flex flex-col items-center text-center flex-1">
-                  <div className="relative z-10 flex items-center justify-center w-16 h-16 rounded-full border-4 mb-1 shadow-md -translate-y-2 bg-primary-container border-surface-container-lowest text-on-primary-fixed-variant">
+                  <div className="relative z-10 flex items-center justify-center w-16 h-16 rounded-full border-4 mb-1 shadow-md shadow-(--color-ambient-shadow) -translate-y-2 bg-primary-container border-surface-container-lowest text-on-primary-container">
                     <MdWineBar size={32} />
                   </div>
                   <span className="text-label-sm block uppercase tracking-wider mb-1 font-body text-primary">
@@ -147,7 +171,7 @@ export default async function PubCrawlPage() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="text-headline-md text-center font-bold p-sm sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant text-on-surface"
+                    className="text-headline-sm text-center font-bold p-xs sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant font-headline"
                   >
                     Släpp
                   </td>
@@ -207,7 +231,7 @@ export default async function PubCrawlPage() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="text-headline-md text-center font-bold p-sm sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant text-on-surface"
+                    className="text-headline-sm text-center font-bold p-xs sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant font-headline"
                   >
                     Bar
                   </td>
@@ -233,7 +257,7 @@ export default async function PubCrawlPage() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="text-headline-md text-center font-bold p-sm sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant text-on-surface"
+                    className="text-headline-sm text-center font-bold p-xs sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant font-headline"
                   >
                     Kök
                   </td>
