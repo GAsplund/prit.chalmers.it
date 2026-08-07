@@ -1,0 +1,18 @@
+import { drizzle } from 'drizzle-orm/node-postgres';
+import { Pool } from 'pg';
+
+const dbSingleton = () => {
+  const pool = new Pool({
+    connectionString: process.env.DATABASE_URL
+  });
+
+  return drizzle({ client: pool });
+};
+
+declare global {
+  var db: ReturnType<typeof dbSingleton> | undefined;
+}
+
+const db = global.db || dbSingleton();
+
+export default db;

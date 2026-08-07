@@ -1,0 +1,9 @@
+import { migrate } from 'drizzle-orm/node-postgres/migrator';
+import db from '@/db';
+
+export async function register() {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
+    console.log('Running database migrations');
+    await migrate(db, { migrationsFolder: 'drizzle' });
+  }
+}
