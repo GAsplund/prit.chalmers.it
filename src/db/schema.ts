@@ -8,7 +8,6 @@ import {
   check,
   index
 } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm/_relations';
 import { sql } from 'drizzle-orm/sql/sql';
 
 // Pub Events
@@ -42,11 +41,6 @@ export const pubEvents = pgTable(
   ]
 );
 
-export const pubEventsRelations = relations(pubEvents, ({ many }) => ({
-  stages: many(timelineStages),
-  sections: many(staffSections)
-}));
-
 // Timeline Stages
 
 export const timelineStages = pgTable(
@@ -66,13 +60,6 @@ export const timelineStages = pgTable(
   (table) => [index('idx_timeline_stages_event').on(table.eventId)]
 );
 
-export const timelineStagesRelations = relations(timelineStages, ({ one }) => ({
-  event: one(pubEvents, {
-    fields: [timelineStages.eventId],
-    references: [pubEvents.id]
-  })
-}));
-
 // Staff Sections
 
 export const staffSections = pgTable(
@@ -86,17 +73,6 @@ export const staffSections = pgTable(
     order: integer('order').notNull()
   },
   (table) => [unique('uniq_event_section_order').on(table.eventId, table.order)]
-);
-
-export const staffSectionsRelations = relations(
-  staffSections,
-  ({ one, many }) => ({
-    event: one(pubEvents, {
-      fields: [staffSections.eventId],
-      references: [pubEvents.id]
-    }),
-    rows: many(staffRows)
-  })
 );
 
 // Staff Rows
@@ -113,14 +89,6 @@ export const staffRows = pgTable(
   },
   (table) => [unique('uniq_section_row_order').on(table.sectionId, table.order)]
 );
-
-export const staffRowsRelations = relations(staffRows, ({ one, many }) => ({
-  section: one(staffSections, {
-    fields: [staffRows.sectionId],
-    references: [staffSections.id]
-  }),
-  slots: many(staffSlots)
-}));
 
 // Staff Slots
 
@@ -153,10 +121,3 @@ export const staffSlots = pgTable(
       .where(sql`${table.gammaUserId} IS NOT NULL`)
   ]
 );
-
-export const staffSlotsRelations = relations(staffSlots, ({ one }) => ({
-  row: one(staffRows, {
-    fields: [staffSlots.rowId],
-    references: [staffRows.id]
-  })
-}));

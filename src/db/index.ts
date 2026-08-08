@@ -1,4 +1,5 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
+import relations from './relations';
 import { Pool } from 'pg';
 
 const dbSingleton = () => {
@@ -6,7 +7,7 @@ const dbSingleton = () => {
     connectionString: process.env.DATABASE_URL
   });
 
-  return drizzle({ client: pool });
+  return drizzle({ client: pool, relations });
 };
 
 declare global {
