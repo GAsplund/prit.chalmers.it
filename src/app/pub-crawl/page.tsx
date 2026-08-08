@@ -16,6 +16,7 @@ import UserService from '@/services/userService';
 import UnauthorizedPage from '@/components/ErrorPages/401';
 import ForbiddenPage from '@/components/ErrorPages/403';
 import { MOCK_EVENTS } from '@/types/pub-crawl';
+import PubCrawlService from '@/services/pubCrawlService';
 
 const navItems: NavItem[] = [
   { href: '/', Icon: MdHome, label: 'Hem' },
@@ -24,9 +25,9 @@ const navItems: NavItem[] = [
   { href: '/members', Icon: MdPerson, label: 'Medlemmar' }
 ];
 
-function formatEventDate(dateStr: string): string {
-  const [year, month, day] = dateStr.split('-').map(Number);
-  const s = new Date(year, month - 1, day).toLocaleDateString('sv-SE', {
+function formatEventDate(isoStr: string): string {
+  const d = new Date(isoStr);
+  const s = d.toLocaleDateString('sv-SE', {
     weekday: 'long',
     day: 'numeric',
     month: 'long'
@@ -42,6 +43,8 @@ export default async function PubCrawlPage() {
   if (!isPRIT) return <ForbiddenPage />;
 
   const activeEvent = MOCK_EVENTS.find((e) => e.upcoming);
+  const upcomingEvents = await PubCrawlService.getUpcomingPubCrawls();
+  console.log('upcomingEvents', upcomingEvents);
 
   return (
     <>
@@ -64,7 +67,7 @@ export default async function PubCrawlPage() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="w-2 h-2 rounded-full bg-on-primary-container animate-pulse flex-shrink-0" />
-                    <span className="text-label-sm text-on-primary-container/70 uppercase tracking-wider">
+                    <span className="text-label-sm text-on-primary-container/70 tracking-wider">
                       Pågår nu
                     </span>
                   </div>
@@ -72,7 +75,7 @@ export default async function PubCrawlPage() {
                     {activeEvent.title}
                   </h2>
                   <p className="mt-0.5 text-label-md text-on-primary-container/70">
-                    {formatEventDate(activeEvent.date)}
+                    {formatEventDate(activeEvent.startTime)}
                   </p>
                 </div>
               </div>
@@ -106,7 +109,7 @@ export default async function PubCrawlPage() {
               Nytt event
             </Link>
           </div>
-          <EventList events={MOCK_EVENTS} />
+          <EventList events={upcomingEvents} />
         </Card>
       </main>
 

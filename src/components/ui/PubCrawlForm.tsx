@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   MdArrowBack,
   MdCalendarToday,
@@ -13,6 +14,7 @@ import type {
   TimelinePhase,
   StaffSection
 } from '@/types/pub-crawl';
+import { createPubCrawl, updatePubCrawl } from '@/app/actions/pubCrawls';
 import Card from '@/components/Card';
 import FormField from '@/components/ui/FormField';
 import PhaseBuilder from '@/components/ui/PhaseBuilder';
@@ -26,7 +28,7 @@ interface PubCrawlFormProps {
 const DEFAULT_TIME_COLUMNS = ['19:00', '20:00', '21:00', '22:00', '23:00'];
 
 function makeDefaultPhases(): TimelinePhase[] {
-  return [{ id: crypto.randomUUID(), label: '', startTime: '', endTime: '' }];
+  return [{ id: crypto.randomUUID(), label: '', time: '' }];
 }
 
 function makeDefaultSections(): StaffSection[] {
@@ -46,13 +48,16 @@ function makeDefaultSections(): StaffSection[] {
 
 /**
  * Shared create/edit form for pub-crawl events.
- * Non-functional (no server action wired) — manages state locally.
+ * Calls server actions on submit, then redirects to the event page.
  */
 export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
   const isEdit = !!initialData;
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
 
   const [title, setTitle] = useState(initialData?.title ?? '');
-  const [date, setDate] = useState(initialData?.date ?? '');
+  const [startTime, setStartTime] = useState(initialData?.startTime ?? '');
+  const [endTime, setEndTime] = useState(initialData?.endTime ?? '');
   // Use lazy initialisers so crypto.randomUUID() runs only on the client,
   // avoiding a server/client hydration mismatch on the generated IDs.
   const [phases, setPhases] = useState<TimelinePhase[]>(
@@ -67,9 +72,31 @@ export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    // TODO: call server action
-    console.log('submit', { title, date, phases, timeColumns, sections });
+    startTransition(async () => {
+      const input = {
+        title,
+        startTime,
+        endTime,
+        phases,
+        timeColumns,
+        schedule: sections.map((s) => ({
+          id: s.id,
+          name: s.name,
+          slots: s.slots
+        }))
+      };
+
+      if (isEdit) {
+        await updatePubCrawl(initialData.id, input);
+        router.push(`/pub-crawl/${initialData.id}`);
+      } else {
+        const id = await createPubCrawl(input);
+        router.push(`/pub-crawl/${id}`);
+      }
+    });
   }
+
+  console.log('startTime', startTime, 'endTime', endTime);
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-md">
@@ -117,12 +144,21 @@ export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
         />
 
         <FormField
-          id="event-date"
-          label="Datum"
-          type="date"
+          id="event-start"
+          label="Start"
+          type="datetime-local"
           required
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
+          value={startTime}
+          onChange={(e) => setStartTime(e.target.value)}
+        />
+
+        <FormField
+          id="event-end"
+          label="Slut"
+          type="datetime-local"
+          required
+          value={endTime}
+          onChange={(e) => setEndTime(e.target.value)}
         />
       </Card>
 
@@ -166,9 +202,10 @@ export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
           </Link>
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-full text-label-md bg-primary text-on-primary hover:opacity-90 transition-opacity"
+            disabled={isPending}
+            className="px-6 py-2.5 rounded-full text-label-md bg-primary text-on-primary hover:opacity-90 transition-opacity disabled:opacity-50"
           >
-            {isEdit ? 'Spara ändringar' : 'Skapa event'}
+            {isPending ? 'Sparar…' : isEdit ? 'Spara ändringar' : 'Skapa event'}
           </button>
         </div>
       </Card>

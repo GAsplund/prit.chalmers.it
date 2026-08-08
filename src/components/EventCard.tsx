@@ -48,13 +48,17 @@ export default function EventCard({
               : 'bg-surface-container-highest text-on-surface-variant'
           ].join(' ')}
         >
-          <span className="font-black leading-none text-headline-md">{day}</span>
+          <span className="font-black leading-none text-headline-md">
+            {day}
+          </span>
           <span className="uppercase text-label-sm">{month}</span>
         </div>
 
         {/* Info */}
         <div className="flex-grow min-w-0">
-          <h3 className="mb-1 truncate text-headline-lg-mobile text-on-surface">{title}</h3>
+          <h3 className="mb-1 truncate text-headline-lg-mobile text-on-surface">
+            {title}
+          </h3>
           {time && (
             <p className="flex items-center gap-1 text-body-md text-on-surface-variant">
               <MdSchedule size={16} />

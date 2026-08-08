@@ -11,7 +11,7 @@ interface PhaseBuilderProps {
 }
 
 function newPhase(): TimelinePhase {
-  return { id: crypto.randomUUID(), label: '', startTime: '', endTime: '' };
+  return { id: crypto.randomUUID(), label: '', time: '' };
 }
 
 /**
@@ -21,7 +21,11 @@ function newPhase(): TimelinePhase {
 export default function PhaseBuilder({ phases, onChange }: PhaseBuilderProps) {
   const baseId = useId();
 
-  function update(id: string, field: keyof Omit<TimelinePhase, 'id'>, value: string) {
+  function update(
+    id: string,
+    field: keyof Omit<TimelinePhase, 'id'>,
+    value: string
+  ) {
     onChange(phases.map((p) => (p.id === id ? { ...p, [field]: value } : p)));
   }
 
@@ -48,7 +52,9 @@ export default function PhaseBuilder({ phases, onChange }: PhaseBuilderProps) {
         >
           {/* Row header */}
           <div className="flex items-center justify-between">
-            <span className="text-label-md text-on-surface-variant">Fas {idx + 1}</span>
+            <span className="text-label-md text-on-surface-variant">
+              Fas {idx + 1}
+            </span>
             <button
               type="button"
               onClick={() => remove(phase.id)}
@@ -73,17 +79,10 @@ export default function PhaseBuilder({ phases, onChange }: PhaseBuilderProps) {
           <div className="grid grid-cols-2 gap-sm">
             <FormField
               id={`${baseId}-phase-${phase.id}-start`}
-              label="Starttid"
+              label="Tid"
               type="time"
-              value={phase.startTime}
-              onChange={(e) => update(phase.id, 'startTime', e.target.value)}
-            />
-            <FormField
-              id={`${baseId}-phase-${phase.id}-end`}
-              label="Sluttid"
-              type="time"
-              value={phase.endTime}
-              onChange={(e) => update(phase.id, 'endTime', e.target.value)}
+              value={phase.time}
+              onChange={(e) => update(phase.id, 'time', e.target.value)}
             />
           </div>
         </div>

@@ -5,7 +5,7 @@ import { MdHome, MdPerson, MdLocalBar, MdViewInAr } from 'react-icons/md';
 import UserService from '@/services/userService';
 import UnauthorizedPage from '@/components/ErrorPages/401';
 import ForbiddenPage from '@/components/ErrorPages/403';
-import { MOCK_EVENTS } from '@/types/pub-crawl';
+import PubCrawlService, { toPubCrawlEvent } from '@/services/pubCrawlService';
 import { notFound } from 'next/navigation';
 
 const navItems: NavItem[] = [
@@ -29,8 +29,10 @@ export default async function EditPubCrawlPage({
   if (!isPRIT) return <ForbiddenPage />;
 
   const { id } = await params;
-  const event = MOCK_EVENTS.find((e) => e.id === id);
-  if (!event) notFound();
+  const dbEvent = await PubCrawlService.getPubCrawlById(id);
+  if (!dbEvent) notFound();
+
+  const event = toPubCrawlEvent(dbEvent);
 
   return (
     <>

@@ -1,3 +1,4 @@
+import React from 'react';
 import BottomNavBar from '@/components/BottomNavBar';
 import StatCard from '@/components/StatCard';
 import Card from '@/components/Card';
@@ -20,6 +21,8 @@ import UserService from '@/services/userService';
 import UnauthorizedPage from '@/components/ErrorPages/401';
 import ForbiddenPage from '@/components/ErrorPages/403';
 import Link from 'next/link';
+import PubCrawlService, { toPubCrawlEvent } from '@/services/pubCrawlService';
+import { notFound } from 'next/navigation';
 
 const navItems: NavItem[] = [
   { href: '/', Icon: MdHome, label: 'Hem' },
@@ -52,6 +55,13 @@ export default async function PubCrawlPage({
     return <ForbiddenPage />;
   }
 
+  const dbEvent = await PubCrawlService.getPubCrawlById(id);
+  if (!dbEvent) {
+    notFound();
+  }
+
+  const event = toPubCrawlEvent(dbEvent);
+
   return (
     <>
       <main className="w-full mx-auto px-md pb-32 pt-nav-height max-w-content">
@@ -68,7 +78,7 @@ export default async function PubCrawlPage({
                   Tillbaka till pubrundor
                 </Link>
                 <h1 className="text-headline-xl relative z-10 text-on-surface">
-                  Pubrunda LP1 2026
+                  {event.title}
                 </h1>
               </div>
               <Link
@@ -101,7 +111,7 @@ export default async function PubCrawlPage({
                     <MdCheck size={24} />
                   </div>
                   <span className="text-label-sm block uppercase tracking-wider mb-1 line-through font-body text-on-surface-variant">
-                    16:00 – 17:31
+                    16:00 - 17:31
                   </span>
                   <h4 className="text-label-md line-through font-body text-on-surface">
                     Genomgång och slutprepp
@@ -114,7 +124,7 @@ export default async function PubCrawlPage({
                     <MdWineBar size={32} />
                   </div>
                   <span className="text-label-sm block uppercase tracking-wider mb-1 font-body text-primary">
-                    17:31 – 02:00
+                    17:31 - 02:00
                   </span>
                   <h4 className="text-headline-md text-on-surface">Öppet!</h4>
                 </div>
@@ -125,7 +135,7 @@ export default async function PubCrawlPage({
                     <MdOutlineCleaningServices size={24} />
                   </div>
                   <span className="text-label-sm block uppercase tracking-wider mb-1 font-body text-on-surface-variant">
-                    02:00 – 07:00
+                    02:00 - 07:00
                   </span>
                   <h4 className="text-label-md font-body text-on-surface">
                     Stängning och städ
@@ -149,136 +159,48 @@ export default async function PubCrawlPage({
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-surface-variant">
-                  <th className="text-label-md text-on-surface-variant text-center p-sm">
-                    19:00
-                  </th>
-                  <th className="text-label-md text-on-surface-variant text-center p-sm">
-                    20:00
-                  </th>
-                  <th className="text-label-md text-on-surface-variant text-center p-sm">
-                    21:00
-                  </th>
-                  <th className="text-label-md text-on-surface-variant text-center p-sm">
-                    22:00
-                  </th>
-                  <th className="text-label-md text-on-surface-variant text-center p-sm">
-                    23:00
-                  </th>
+                  {event.timeColumns.map((col) => (
+                    <th
+                      key={col}
+                      className="text-label-md text-on-surface-variant text-center p-sm"
+                    >
+                      {col}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {/* Row 1: Entré */}
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="text-headline-sm text-center font-bold p-xs sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant font-headline"
-                  >
-                    Släpp
-                  </td>
-                </tr>
-                <tr className="border-surface-variant hover:bg-surface-container/50 transition-colors divide-x">
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Anna K.
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Anna K.
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Erik M.
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm text-on-surface-variant italic">
-                    Unassigned
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Erik M.
-                  </td>
-                </tr>
-                <tr className="hover:bg-surface-container/50 transition-colors divide-x border-surface-variant">
-                  <td className="text-center border-surface-variant p-sm text-label-sm text-on-surface-variant italic">
-                    Unassigned
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Team Alpha (3 pax)
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm text-on-surface-variant italic">
-                    Unassigned
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm text-on-surface-variant italic">
-                    Unassigned
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm text-on-surface-variant italic">
-                    Unassigned
-                  </td>
-                </tr>
-                <tr className="border-surface-variant hover:bg-surface-container/50 transition-colors divide-x">
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Johan L. (Lead)
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Maria S.
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Maria S.
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Johan L.
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm text-on-surface-variant italic">
-                    Unassigned
-                  </td>
-                </tr>
-                {/* Row 2: Bar */}
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="text-headline-sm text-center font-bold p-xs sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant font-headline"
-                  >
-                    Bar
-                  </td>
-                </tr>
-                <tr className="border-surface-variant hover:bg-surface-container/50 transition-colors divide-x">
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Johan L. (Lead)
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Maria S.
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Maria S.
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Johan L.
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm text-on-surface-variant italic">
-                    Unassigned
-                  </td>
-                </tr>
-                {/* Row 3: Kök */}
-                <tr>
-                  <td
-                    colSpan={5}
-                    className="text-headline-sm text-center font-bold p-xs sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant font-headline"
-                  >
-                    Kök
-                  </td>
-                </tr>
-                <tr className="hover:bg-surface-container/50 transition-colors divide-x">
-                  <td className="text-center border-surface-variant p-sm text-label-sm text-on-surface-variant italic">
-                    Unassigned
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm">
-                    Team Alpha (3 pax)
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm text-on-surface-variant italic">
-                    Unassigned
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm text-on-surface-variant italic">
-                    Unassigned
-                  </td>
-                  <td className="text-center border-surface-variant p-sm text-label-sm text-on-surface-variant italic">
-                    Unassigned
-                  </td>
-                </tr>
+                {event.schedule.map((section) => (
+                  <React.Fragment key={section.id}>
+                    <tr>
+                      <td
+                        colSpan={event.timeColumns.length}
+                        className="text-headline-sm text-center font-bold p-xs sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant font-headline"
+                      >
+                        {section.name}
+                      </td>
+                    </tr>
+                    {section.slots.map((row, rIdx) => (
+                      <tr
+                        key={`${section.id}-row-${rIdx}`}
+                        className="border-surface-variant hover:bg-surface-container/50 transition-colors divide-x"
+                      >
+                        {row.map((slot, cIdx) => (
+                          <td
+                            key={`${section.id}-${rIdx}-${cIdx}`}
+                            className={`text-center border-surface-variant p-sm text-label-sm ${
+                              slot.name
+                                ? ''
+                                : 'text-on-surface-variant italic'
+                            }`}
+                          >
+                            {slot.name || 'Unassigned'}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                ))}
               </tbody>
             </table>
           </Card>
@@ -294,9 +216,12 @@ export default async function PubCrawlPage({
                   </div>
                   <h2 className="text-headline-md text-on-surface">Ekonomi</h2>
                 </div>
-                <span className="text-label-sm px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container">
-                  Live
-                </span>
+                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-container">
+                  <span className="w-2 h-2 rounded-full bg-on-primary-container animate-pulse flex-shrink-0" />
+                  <span className="text-label-sm text-on-secondary-container">
+                    Live
+                  </span>
+                </div>
               </div>
 
               <div className="flex justify-between items-center mb-6">
