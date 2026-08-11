@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useMemo, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
@@ -12,38 +12,52 @@ import {
 import type {
   PubCrawlEvent,
   TimelinePhase,
-  StaffSection
+  StaffSection,
+  FormTimelinePhase
 } from '@/types/pub-crawl';
 import { createPubCrawl, updatePubCrawl } from '@/app/actions/pubCrawls';
 import Card from '@/components/Card';
 import FormField from '@/components/ui/FormField';
 import PhaseBuilder from '@/components/ui/PhaseBuilder';
 import SectionBuilder from '@/components/ui/SectionBuilder';
+import LocaleService from '@/services/localeService';
 
 interface PubCrawlFormProps {
   /** Existing event to edit; undefined = creating new */
   initialData?: PubCrawlEvent;
 }
 
-const DEFAULT_TIME_COLUMNS = ['19:00', '20:00', '21:00', '22:00', '23:00'];
+const DEFAULT_COLUMN_COUNT = 5;
 
 function makeDefaultPhases(): TimelinePhase[] {
-  return [{ id: crypto.randomUUID(), label: '', time: '' }];
+  return [{ id: crypto.randomUUID(), label: '', time: new Date() }];
 }
 
-function makeDefaultSections(): StaffSection[] {
+function makeDefaultSections(colCount: number): StaffSection[] {
   return [
     {
       id: crypto.randomUUID(),
       name: '',
       rowCount: 1,
-      slots: [
-        Array.from({ length: DEFAULT_TIME_COLUMNS.length }, () => ({
-          name: ''
-        }))
-      ]
+      slots: [Array.from({ length: colCount }, () => ({ name: '' }))]
     }
   ];
+}
+
+function toFormTimelinePhases(phases: TimelinePhase[]): FormTimelinePhase[] {
+  return phases.map((p) => ({
+    id: p.id,
+    label: p.label,
+    time: LocaleService.dateToInputString(p.time)
+  }));
+}
+
+function toTimelinePhases(phases: FormTimelinePhase[]): TimelinePhase[] {
+  return phases.map((p) => ({
+    id: p.id,
+    label: p.label,
+    time: LocaleService.inputStringToDate(p.time)
+  }));
 }
 
 /**
@@ -55,29 +69,86 @@ export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
 
+  // ── Core state (Date objects) ──────────────────────────────────────────────
   const [title, setTitle] = useState(initialData?.title ?? '');
-  const [startTime, setStartTime] = useState(initialData?.startTime ?? '');
-  const [endTime, setEndTime] = useState(initialData?.endTime ?? '');
-  // Use lazy initialisers so crypto.randomUUID() runs only on the client,
-  // avoiding a server/client hydration mismatch on the generated IDs.
-  const [phases, setPhases] = useState<TimelinePhase[]>(
-    () => initialData?.phases ?? makeDefaultPhases()
+  const [startTime, setStartTime] = useState<Date>(
+    initialData?.startTime ?? new Date()
   );
-  const [timeColumns, setTimeColumns] = useState<string[]>(
-    () => initialData?.timeColumns ?? DEFAULT_TIME_COLUMNS
-  );
-  const [sections, setSections] = useState<StaffSection[]>(
-    () => initialData?.schedule ?? makeDefaultSections()
+  const [endTime, setEndTime] = useState<Date>(
+    initialData?.endTime ?? new Date()
   );
 
+  // Schedule start time: initialized from first timeColumn or event start
+  const [scheduleStartTime, setScheduleStartTime] = useState<Date>(() => {
+    if (initialData?.timeColumns?.length && initialData?.startTime) {
+      return LocaleService.timeStringToDate(
+        LocaleService.dateToTimeString(initialData.timeColumns[0]),
+        initialData.startTime
+      );
+    }
+    return initialData?.startTime ?? new Date();
+  });
+
+  // ── Timeline phases ────────────────────────────────────────────────────────
+  const [phases, setPhases] = useState<FormTimelinePhase[]>(() =>
+    toFormTimelinePhases(initialData?.phases ?? makeDefaultPhases())
+  );
+
+  // ── Sections (staff schedule data) ─────────────────────────────────────────
+  const [sections, setSections] = useState<StaffSection[]>(
+    () => initialData?.schedule ?? makeDefaultSections(DEFAULT_COLUMN_COUNT)
+  );
+
+  // ── Derived: column count from sections ─────────────────────────────────────
+  const columnCount = useMemo(
+    () => sections[0]?.slots[0]?.length ?? DEFAULT_COLUMN_COUNT,
+    [sections]
+  );
+
+  // ── Derived: time columns from scheduleStartTime + columnCount ─────────────
+  const timeColumns = useMemo<Date[]>(() => {
+    return Array.from({ length: columnCount }, (_, i) => {
+      const date = new Date(scheduleStartTime);
+      date.setHours(date.getHours() + i, 0, 0, 0);
+      return date;
+    });
+  }, [scheduleStartTime, columnCount]);
+
+  // ── Derived: display labels for SectionBuilder ──────────────────────────────
+  const columnLabels = useMemo(
+    () => timeColumns.map((d) => LocaleService.dateToTimeString(d)),
+    [timeColumns]
+  );
+
+  // ── Column add/remove ───────────────────────────────────────────────────────
+  function addColumn() {
+    setSections(
+      sections.map((s) => ({
+        ...s,
+        slots: s.slots.map((row) => [...row, { name: '' }])
+      }))
+    );
+  }
+
+  function removeColumn(idx: number) {
+    setSections(
+      sections.map((s) => ({
+        ...s,
+        slots: s.slots.map((row) => row.filter((_, i) => i !== idx))
+      }))
+    );
+  }
+
+  // ── Submit ──────────────────────────────────────────────────────────────────
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    const convPhases = toTimelinePhases(phases);
     startTransition(async () => {
       const input = {
         title,
         startTime,
         endTime,
-        phases,
+        phases: convPhases,
         timeColumns,
         schedule: sections.map((s) => ({
           id: s.id,
@@ -95,8 +166,6 @@ export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
       }
     });
   }
-
-  console.log('startTime', startTime, 'endTime', endTime);
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-md">
@@ -148,8 +217,8 @@ export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
           label="Start"
           type="datetime-local"
           required
-          value={startTime}
-          onChange={(e) => setStartTime(e.target.value)}
+          value={LocaleService.dateToInputString(startTime)}
+          onChange={(e) => setStartTime(LocaleService.inputStringToDate(e.target.value))}
         />
 
         <FormField
@@ -157,8 +226,8 @@ export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
           label="Slut"
           type="datetime-local"
           required
-          value={endTime}
-          onChange={(e) => setEndTime(e.target.value)}
+          value={LocaleService.dateToInputString(endTime)}
+          onChange={(e) => setEndTime(LocaleService.inputStringToDate(e.target.value))}
         />
       </Card>
 
@@ -183,11 +252,26 @@ export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
           <h2 className="text-headline-md text-on-surface">Personalschema</h2>
         </div>
 
+        <FormField
+          id="schedule-start-time"
+          label="Schema startar"
+          type="time"
+          required
+          value={LocaleService.dateToTimeString(scheduleStartTime)}
+          onChange={(e) => {
+            const [h, m] = e.target.value.split(':').map(Number);
+            const updated = new Date(startTime);
+            updated.setHours(h, m, 0, 0);
+            setScheduleStartTime(updated);
+          }}
+        />
+
         <SectionBuilder
-          timeColumns={timeColumns}
-          onTimeColumnsChange={setTimeColumns}
+          columnLabels={columnLabels}
           sections={sections}
           onSectionsChange={setSections}
+          onAddColumn={addColumn}
+          onRemoveColumn={removeColumn}
         />
       </Card>
 

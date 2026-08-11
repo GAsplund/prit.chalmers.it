@@ -25,8 +25,7 @@ const navItems: NavItem[] = [
   { href: '/members', Icon: MdPerson, label: 'Medlemmar' }
 ];
 
-function formatEventDate(isoStr: string): string {
-  const d = new Date(isoStr);
+function formatEventDate(d: Date): string {
   const s = d.toLocaleDateString('sv-SE', {
     weekday: 'long',
     day: 'numeric',
@@ -44,7 +43,6 @@ export default async function PubCrawlPage() {
 
   const activeEvent = MOCK_EVENTS.find((e) => e.upcoming);
   const upcomingEvents = await PubCrawlService.getUpcomingPubCrawls();
-  console.log('upcomingEvents', upcomingEvents);
 
   return (
     <>

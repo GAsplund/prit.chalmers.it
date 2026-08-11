@@ -1,6 +1,12 @@
 export interface TimelinePhase {
   id: string;
   label: string;
+  time: Date;
+}
+
+export interface FormTimelinePhase {
+  id: string;
+  label: string;
   time: string;
 }
 
@@ -21,14 +27,14 @@ export interface PubCrawlEvent {
   id: string;
   title: string;
   /** ISO datetime string */
-  startTime: string;
+  startTime: Date;
   /** ISO datetime string */
-  endTime: string;
+  endTime: Date;
   upcoming: boolean;
   /** Ordered list of timeline phases (prep → open → cleanup etc.) */
   phases: TimelinePhase[];
   /** Shared time-column headers across all schedule sections, e.g. ["19:00","20:00","23:00"] */
-  timeColumns: string[];
+  timeColumns: Date[];
   /** Staff schedule sections (Släpp, Bar, Kök …) */
   schedule: StaffSection[];
 }
@@ -39,15 +45,29 @@ export const MOCK_EVENTS: PubCrawlEvent[] = [
   {
     id: '1',
     title: 'Höstpubrunda',
-    startTime: '2026-10-24T16:00',
-    endTime: '2026-10-25T07:00',
+    startTime: new Date('2026-10-24T16:00'),
+    endTime: new Date('2026-10-25T07:00'),
     upcoming: true,
     phases: [
-      { id: 'p1', label: 'Genomgång och slutprepp', time: '16:00' },
-      { id: 'p2', label: 'Öppet!', time: '17:31' },
-      { id: 'p3', label: 'Stängning och städ', time: '02:00' }
+      {
+        id: 'p1',
+        label: 'Genomgång och slutprepp',
+        time: new Date('2026-10-24T16:00')
+      },
+      { id: 'p2', label: 'Öppet!', time: new Date('2026-10-24T17:31') },
+      {
+        id: 'p3',
+        label: 'Stängning och städ',
+        time: new Date('2026-10-25T02:00')
+      }
     ],
-    timeColumns: ['19:00', '20:00', '21:00', '22:00', '23:00'],
+    timeColumns: [
+      new Date('2026-10-24T19:00'),
+      new Date('2026-10-24T20:00'),
+      new Date('2026-10-24T21:00'),
+      new Date('2026-10-24T22:00'),
+      new Date('2026-10-24T23:00')
+    ],
     schedule: [
       {
         id: 's1',
@@ -110,15 +130,21 @@ export const MOCK_EVENTS: PubCrawlEvent[] = [
   {
     id: '2',
     title: 'Städdag Hubben',
-    startTime: '2026-11-12T10:00',
-    endTime: '2026-11-12T15:00',
+    startTime: new Date('2026-11-12T10:00'),
+    endTime: new Date('2026-11-12T15:00'),
     upcoming: false,
     phases: [
-      { id: 'p1', label: 'Förberedelse', time: '10:00' },
-      { id: 'p2', label: 'Städning', time: '11:00' },
-      { id: 'p3', label: 'Avslutning', time: '14:00' }
+      { id: 'p1', label: 'Förberedelse', time: new Date('2026-11-12T10:00') },
+      { id: 'p2', label: 'Städning', time: new Date('2026-11-12T11:00') },
+      { id: 'p3', label: 'Avslutning', time: new Date('2026-11-12T14:00') }
     ],
-    timeColumns: ['10:00', '11:00', '12:00', '13:00', '14:00'],
+    timeColumns: [
+      new Date('2026-11-12T10:00'),
+      new Date('2026-11-12T11:00'),
+      new Date('2026-11-12T12:00'),
+      new Date('2026-11-12T13:00'),
+      new Date('2026-11-12T14:00')
+    ],
     schedule: [
       {
         id: 's1',

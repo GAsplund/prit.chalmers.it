@@ -1,7 +1,12 @@
 import type { ComponentPropsWithoutRef, ElementType } from 'react';
 
-type CardVariant = 'surface' | 'gradient' | 'tertiary';
-type CardSize = 'md' | 'lg';
+type CardVariant =
+  | 'surface'
+  | 'gradient'
+  | 'tertiary'
+  | 'highlight'
+  | 'surface-variant';
+type CardSize = 'sm' | 'md' | 'lg' | 'chip';
 
 type CardProps<T extends ElementType = 'div'> = {
   as?: T;
@@ -12,15 +17,20 @@ type CardProps<T extends ElementType = 'div'> = {
 
 const variantClasses: Record<CardVariant, string> = {
   surface: 'bg-surface-container-lowest border border-outline-variant/20',
+  highlight: 'bg-primary-container/10 border-2 border-primary-container', // bg-[rgba(9,205,218,0.05)]
   gradient:
     'bg-primary-container border-transparent text-on-primary-container overflow-hidden',
   tertiary:
-    'bg-tertiary-container border border-outline-variant/20 text-on-tertiary-container'
+    'bg-tertiary-container border border-outline-variant/20 text-on-tertiary-container',
+  'surface-variant':
+    'bg-surface-variant/50 border border-outline-variant/20 text-on-surface-variant'
 };
 
 const sizeClasses: Record<CardSize, string> = {
+  sm: 'rounded-2xl p-sm',
   md: 'rounded-xl p-md',
-  lg: 'rounded-lg p-lg'
+  lg: 'rounded-lg p-lg',
+  chip: 'rounded-full px-4 py-2'
 };
 
 /**
@@ -32,7 +42,7 @@ const sizeClasses: Record<CardSize, string> = {
  *
  * @param as       — rendered element or component (default: 'div')
  * @param variant  — 'surface' (default) | 'gradient' | 'tertiary'
- * @param size     — 'md' (p-md, rounded-xl) | 'lg' (p-lg, rounded-lg)
+ * @param size     — 'sm' (p-sm, rounded-2xl) | 'md' (p-md, rounded-xl) | 'lg' (p-lg, rounded-lg) | 'chip' (rounded-full)
  * @param className — additional Tailwind classes
  */
 export default function Card<T extends ElementType = 'div'>({

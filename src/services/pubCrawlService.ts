@@ -13,28 +13,19 @@ type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 type DbEvent = Awaited<ReturnType<typeof PubCrawlService.getPubCrawlById>>;
 
-function pad(n: number): string {
-  return n.toString().padStart(2, '0');
-}
-
-function formatTime(date: Date): string {
-  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
-
-function formatDateTimeLocal(date: Date): string {
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${formatTime(date)}`;
-}
-
 function toPubCrawlEvent(event: NonNullable<DbEvent>): PubCrawlEvent {
-  const timeColumns = [
-    ...new Set(
-      event.sections.flatMap((section) =>
-        section.rows.flatMap((row) =>
-          row.slots.map((slot) => formatTime(slot.slotTime))
-        )
-      )
+  const seen = new Map<number, Date>();
+  event.sections.forEach((section) =>
+    section.rows.forEach((row) =>
+      row.slots.forEach((slot) => {
+        const t = slot.slotTime.getTime();
+        if (!seen.has(t)) seen.set(t, slot.slotTime);
+      })
     )
-  ].sort();
+  );
+  const timeColumns = [...seen.values()].sort(
+    (a, b) => a.getTime() - b.getTime()
+  );
 
   const schedule: StaffSection[] = event.sections
     .sort((a, b) => a.order - b.order)
@@ -45,11 +36,12 @@ function toPubCrawlEvent(event: NonNullable<DbEvent>): PubCrawlEvent {
       slots: section.rows
         .sort((a, b) => a.order - b.order)
         .map((row) => {
-          const byTime = new Map(
-            row.slots.map((s) => [formatTime(s.slotTime), s.name ?? ''])
+          const byTime = new Map<number, string>();
+          row.slots.forEach((s) =>
+            byTime.set(s.slotTime.getTime(), s.name ?? '')
           );
           return timeColumns.map((col) => ({
-            name: byTime.get(col) ?? ''
+            name: byTime.get(col.getTime()) ?? ''
           }));
         })
     }));
@@ -57,15 +49,15 @@ function toPubCrawlEvent(event: NonNullable<DbEvent>): PubCrawlEvent {
   return {
     id: event.id,
     title: event.title,
-    startTime: formatDateTimeLocal(event.startTime),
-    endTime: formatDateTimeLocal(event.endTime),
+    startTime: event.startTime,
+    endTime: event.endTime,
     upcoming: event.startTime > new Date(),
     phases: event.stages
       .sort((a, b) => a.startTime.getTime() - b.startTime.getTime())
       .map((stage) => ({
         id: stage.id,
         label: stage.label,
-        time: formatTime(stage.startTime)
+        time: stage.startTime
       })),
     timeColumns,
     schedule
@@ -76,23 +68,15 @@ export { toPubCrawlEvent };
 
 export interface PubCrawlInput {
   title: string;
-  startTime: string;
-  endTime: string;
-  phases: { id: string; label: string; time: string }[];
-  timeColumns: string[];
+  startTime: Date;
+  endTime: Date;
+  phases: { id: string; label: string; time: Date }[];
+  timeColumns: Date[];
   schedule: {
     id: string;
     name: string;
     slots: { name: string }[][];
   }[];
-}
-
-function eventDate(startTime: string): string {
-  return startTime.slice(0, 10);
-}
-
-function parseDateTime(date: string, time: string): Date {
-  return new Date(`${date}T${time}:00`);
 }
 
 async function replaceChildren(tx: Tx, eventId: string, input: PubCrawlInput) {
@@ -104,7 +88,7 @@ async function replaceChildren(tx: Tx, eventId: string, input: PubCrawlInput) {
       id: phase.id,
       eventId,
       label: phase.label,
-      startTime: parseDateTime(eventDate(input.startTime), phase.time),
+      startTime: phase.time,
       order: i
     });
   }
@@ -126,13 +110,14 @@ async function replaceChildren(tx: Tx, eventId: string, input: PubCrawlInput) {
         order: rIdx
       });
 
-      const date = eventDate(input.startTime);
       const slots = row
         .map((slot, cIdx) => {
           if (!slot.name) return null;
+          const slotTime = new Date(input.timeColumns[cIdx]);
+          slotTime.setSeconds(0, 0);
           return {
             rowId,
-            slotTime: parseDateTime(date, input.timeColumns[cIdx]),
+            slotTime,
             name: slot.name
           };
         })

@@ -1,4 +1,3 @@
-import React from 'react';
 import BottomNavBar from '@/components/BottomNavBar';
 import StatCard from '@/components/StatCard';
 import Card from '@/components/Card';
@@ -7,15 +6,14 @@ import {
   MdHome,
   MdAccountBalanceWallet,
   MdBarChart,
-  MdCheck,
-  MdWineBar,
-  MdOutlineCleaningServices,
   MdCalendarToday,
   MdPerson,
   MdLocalBar,
   MdViewInAr,
   MdEdit,
-  MdArrowBack
+  MdArrowBack,
+  MdPhone,
+  MdGroup
 } from 'react-icons/md';
 import UserService from '@/services/userService';
 import UnauthorizedPage from '@/components/ErrorPages/401';
@@ -23,6 +21,9 @@ import ForbiddenPage from '@/components/ErrorPages/403';
 import Link from 'next/link';
 import PubCrawlService, { toPubCrawlEvent } from '@/services/pubCrawlService';
 import { notFound } from 'next/navigation';
+import PubCrawlProgress from '@/components/ui/PubCrawlProgress';
+import UpcomingSchedule from '@/components/ui/UpcomingSchedule';
+import ScheduleTable from '@/components/ui/ScheduleTable';
 
 const navItems: NavItem[] = [
   { href: '/', Icon: MdHome, label: 'Hem' },
@@ -90,59 +91,81 @@ export default async function PubCrawlPage({
               </Link>
             </div>
 
-            {/* Timeline */}
-            <div className="relative mt-8 mb-4 z-10">
-              <div className="relative flex justify-between gap-gutter">
-                {/* Leading line: left edge → item 1 (fades in) */}
-                <div className="timeline-connector timeline-lead" />
-
-                {/* Connector line: item 1 → item 2 (solid, done) */}
-                <div className="timeline-connector timeline-done" />
-
-                {/* Connector line: item 2 → item 3 (animated dots) */}
-                <div className="timeline-connector timeline-active crawling-line" />
-
-                {/* Trailing line: item 3 → right edge (fades out) */}
-                <div className="timeline-connector timeline-trailing" />
-
-                {/* Timeline Item 1 — Done */}
-                <div className="flex flex-col items-center text-center flex-1 opacity-60">
-                  <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-4 mb-3 shadow-sm bg-primary border-surface-container-lowest text-on-primary">
-                    <MdCheck size={24} />
+            <div className="flex gap-4 mb-6 h-70">
+              <PubCrawlProgress phases={event.phases} endTime={event.endTime} />
+              <Card
+                variant="surface"
+                size="md"
+                className="flex-2 min-h-0 flex flex-col"
+              >
+                <div className="flex gap-3 items-center mb-2">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-surface-container text-secondary">
+                    <MdGroup size={20} />
                   </div>
-                  <span className="text-label-sm block uppercase tracking-wider mb-1 line-through font-body text-on-surface-variant">
-                    16:00 - 17:31
-                  </span>
-                  <h4 className="text-label-md line-through font-body text-on-surface">
-                    Genomgång och slutprepp
-                  </h4>
+                  <h2 className="text-headline-md text-on-surface">
+                    Viktiga kontakter
+                  </h2>
                 </div>
-
-                {/* Timeline Item 2 — Active */}
-                <div className="flex flex-col items-center text-center flex-1">
-                  <div className="relative z-10 flex items-center justify-center w-16 h-16 rounded-full border-4 mb-1 shadow-md shadow-(--color-ambient-shadow) -translate-y-2 bg-primary-container border-surface-container-lowest text-on-primary-container">
-                    <MdWineBar size={32} />
-                  </div>
-                  <span className="text-label-sm block uppercase tracking-wider mb-1 font-body text-primary">
-                    17:31 - 02:00
-                  </span>
-                  <h4 className="text-headline-md text-on-surface">Öppet!</h4>
+                <div className="grid grid-cols-1 lg:grid-cols-2 content-start gap-2 overflow-y-auto min-h-0 flex-1">
+                  <Card
+                    size="chip"
+                    variant="surface-variant"
+                    className="flex flex-row gap-2 justify-between items-center flex"
+                  >
+                    <div>
+                      <h2 className="font-semibold">112</h2>
+                      <p className="text-label-sm text-on-surface-variant">
+                        Vid nödsituation
+                      </p>
+                    </div>
+                    <Link
+                      href="tel:112"
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-primary border border-primary/40 hover:bg-surface-container-low transition-colors"
+                    >
+                      <MdPhone size={16} />
+                    </Link>
+                  </Card>
+                  <Card
+                    size="chip"
+                    variant="surface-variant"
+                    className="flex flex-row gap-2 justify-between items-center"
+                  >
+                    <div>
+                      <h2 className="font-semibold">Cubsec</h2>
+                      <p className="text-label-sm text-on-surface-variant">
+                        Ordningsvakter
+                      </p>
+                    </div>
+                    <Link
+                      href="tel:031-772 44 99"
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-primary border border-primary/40 hover:bg-surface-container-low transition-colors"
+                    >
+                      <MdPhone size={16} />
+                    </Link>
+                  </Card>
+                  <Card
+                    size="chip"
+                    variant="surface-variant"
+                    className="flex flex-row gap-2 justify-between items-center"
+                  >
+                    <div>
+                      <h2 className="font-semibold">Linus Ordal (Skaut)</h2>
+                      <p className="text-label-sm text-on-surface-variant">
+                        Serveringsansvarig
+                      </p>
+                    </div>
+                    <Link
+                      href="tel:070-123 45 67"
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-primary border border-primary/40 hover:bg-surface-container-low transition-colors"
+                    >
+                      <MdPhone size={16} />
+                    </Link>
+                  </Card>
                 </div>
-
-                {/* Timeline Item 3 — Upcoming */}
-                <div className="flex flex-col items-center text-center flex-1 opacity-80">
-                  <div className="relative z-10 flex items-center justify-center w-12 h-12 rounded-full border-4 mb-3 shadow-sm bg-surface-variant border-surface-container-lowest text-on-surface-variant">
-                    <MdOutlineCleaningServices size={24} />
-                  </div>
-                  <span className="text-label-sm block uppercase tracking-wider mb-1 font-body text-on-surface-variant">
-                    02:00 - 07:00
-                  </span>
-                  <h4 className="text-label-md font-body text-on-surface">
-                    Stängning och städ
-                  </h4>
-                </div>
-              </div>
+              </Card>
             </div>
+
+            <UpcomingSchedule phases={event.phases} />
           </Card>
 
           {/* Schedule Grid */}
@@ -156,53 +179,11 @@ export default async function PubCrawlPage({
               </h2>
             </div>
 
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="border-b border-surface-variant">
-                  {event.timeColumns.map((col) => (
-                    <th
-                      key={col}
-                      className="text-label-md text-on-surface-variant text-center p-sm"
-                    >
-                      {col}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {event.schedule.map((section) => (
-                  <React.Fragment key={section.id}>
-                    <tr>
-                      <td
-                        colSpan={event.timeColumns.length}
-                        className="text-headline-sm text-center font-bold p-xs sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant font-headline"
-                      >
-                        {section.name}
-                      </td>
-                    </tr>
-                    {section.slots.map((row, rIdx) => (
-                      <tr
-                        key={`${section.id}-row-${rIdx}`}
-                        className="border-surface-variant hover:bg-surface-container/50 transition-colors divide-x"
-                      >
-                        {row.map((slot, cIdx) => (
-                          <td
-                            key={`${section.id}-${rIdx}-${cIdx}`}
-                            className={`text-center border-surface-variant p-sm text-label-sm ${
-                              slot.name
-                                ? ''
-                                : 'text-on-surface-variant italic'
-                            }`}
-                          >
-                            {slot.name || 'Unassigned'}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
+            <ScheduleTable
+              timeColumns={event.timeColumns}
+              schedule={event.schedule}
+              eventEndTime={event.endTime}
+            />
           </Card>
 
           {/* Financial health grid */}

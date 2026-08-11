@@ -2,15 +2,15 @@
 
 import { useId } from 'react';
 import { MdAdd, MdDelete } from 'react-icons/md';
-import type { TimelinePhase } from '@/types/pub-crawl';
+import type { FormTimelinePhase } from '@/types/pub-crawl';
 import FormField from './FormField';
 
 interface PhaseBuilderProps {
-  phases: TimelinePhase[];
-  onChange: (phases: TimelinePhase[]) => void;
+  phases: FormTimelinePhase[];
+  onChange: (phases: FormTimelinePhase[]) => void;
 }
 
-function newPhase(): TimelinePhase {
+function newPhase(): FormTimelinePhase {
   return { id: crypto.randomUUID(), label: '', time: '' };
 }
 
@@ -23,7 +23,7 @@ export default function PhaseBuilder({ phases, onChange }: PhaseBuilderProps) {
 
   function update(
     id: string,
-    field: keyof Omit<TimelinePhase, 'id'>,
+    field: keyof Omit<FormTimelinePhase, 'id'>,
     value: string
   ) {
     onChange(phases.map((p) => (p.id === id ? { ...p, [field]: value } : p)));
@@ -80,7 +80,7 @@ export default function PhaseBuilder({ phases, onChange }: PhaseBuilderProps) {
             <FormField
               id={`${baseId}-phase-${phase.id}-start`}
               label="Tid"
-              type="time"
+              type="datetime-local"
               value={phase.time}
               onChange={(e) => update(phase.id, 'time', e.target.value)}
             />

@@ -5,11 +5,12 @@ import type { StaffSection, StaffSlot } from '@/types/pub-crawl';
 import React, { useState } from 'react';
 
 interface SectionBuilderProps {
-  /** Shared time-column headers (e.g. ["19:00","20:00","21:00"]) */
-  timeColumns: string[];
-  onTimeColumnsChange: (cols: string[]) => void;
+  /** Derived "HH:MM" labels for each column, read-only */
+  columnLabels: string[];
   sections: StaffSection[];
   onSectionsChange: (sections: StaffSection[]) => void;
+  onAddColumn: () => void;
+  onRemoveColumn: (idx: number) => void;
 }
 
 function newSection(colCount: number): StaffSection {
@@ -21,20 +22,6 @@ function newSection(colCount: number): StaffSection {
   };
 }
 
-function resizeSlots(section: StaffSection, colCount: number): StaffSection {
-  const slots = section.slots.map((row) => {
-    const diff = colCount - row.length;
-    if (diff > 0)
-      return [
-        ...row,
-        ...Array.from({ length: diff }, (): StaffSlot => ({ name: '' }))
-      ];
-    if (diff < 0) return row.slice(0, colCount);
-    return row;
-  });
-  return { ...section, slots };
-}
-
 function createEmptyRow(colCount: number): StaffSlot[] {
   return Array.from({ length: colCount }, (): StaffSlot => ({ name: '' }));
 }
@@ -42,49 +29,17 @@ function createEmptyRow(colCount: number): StaffSlot[] {
 const inputBase =
   'w-full rounded border border-outline-variant/40 bg-surface-container-lowest px-2 py-1.5 text-on-surface placeholder:text-outline/60 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-colors text-label-sm';
 
-/**
- * Unified schedule editor rendered as a single table.
- *
- * - Header row: "Station / Rader" stub + one time-input column per time slot + add-column cell
- * - Each section: full-width section-name/row-count header row, then its staff rows
- * - Footer row: add-section button
- */
 export default function SectionBuilder({
-  timeColumns,
-  onTimeColumnsChange,
+  columnLabels,
   sections,
-  onSectionsChange
+  onSectionsChange,
+  onAddColumn,
+  onRemoveColumn
 }: SectionBuilderProps) {
   const [draggedRow, setDraggedRow] = useState<{
     sectionId: string;
     rowIdx: number;
   } | null>(null);
-
-  // ── Time column helpers ──────────────────────────────────────────────────────
-
-  function updateColumn(idx: number, value: string) {
-    const next = [...timeColumns];
-    next[idx] = value;
-    onTimeColumnsChange(next);
-  }
-
-  function addColumn() {
-    const next = [...timeColumns, ''];
-    onTimeColumnsChange(next);
-    onSectionsChange(sections.map((s) => resizeSlots(s, next.length)));
-  }
-
-  function removeColumn(idx: number) {
-    if (timeColumns.length <= 1) return;
-    const next = timeColumns.filter((_, i) => i !== idx);
-    onTimeColumnsChange(next);
-    onSectionsChange(
-      sections.map((s) => ({
-        ...s,
-        slots: s.slots.map((row) => row.filter((_, i) => i !== idx))
-      }))
-    );
-  }
 
   // ── Section helpers ──────────────────────────────────────────────────────────
 
@@ -99,7 +54,7 @@ export default function SectionBuilder({
       sections.map((section) => {
         if (section.id !== id) return section;
         const slots = [...section.slots];
-        slots.splice(afterRowIdx + 1, 0, createEmptyRow(timeColumns.length));
+        slots.splice(afterRowIdx + 1, 0, createEmptyRow(columnLabels.length));
         return {
           ...section,
           rowCount: slots.length,
@@ -147,7 +102,7 @@ export default function SectionBuilder({
   }
 
   function addSection() {
-    onSectionsChange([...sections, newSection(timeColumns.length)]);
+    onSectionsChange([...sections, newSection(columnLabels.length)]);
   }
 
   function updateSlot(
@@ -170,12 +125,12 @@ export default function SectionBuilder({
   }
 
   // total columns: 1 (station stub) + N (time cols) + 1 (add-col)
-  const totalCols = 1 + timeColumns.length + 1;
+  const totalCols = 1 + columnLabels.length + 1;
 
   return (
-    <div className="overflow-x-auto rounded-md border border-outline-variant/40">
+    <div className="overflow-x-auto rounded-2xl border border-outline-variant/40">
       <table className="w-full border-collapse text-label-sm">
-        {/* ── Header: time column inputs ─────────────────────────────────── */}
+        {/* ── Header: time column labels ─────────────────────────────────── */}
         <thead>
           <tr className="border-b border-outline-variant/40">
             {/* Stub cell */}
@@ -183,28 +138,24 @@ export default function SectionBuilder({
               Station / Rader
             </th>
 
-            {/* One editable time-input per column */}
-            {timeColumns.map((col, idx) => (
+            {/* One label per column */}
+            {columnLabels.map((label, idx) => (
               <th
                 key={idx}
-                className="bg-surface-container px-2 py-2 text-center border-r border-outline-variant/20 min-w-[100px]"
+                className="bg-surface-container px-3 py-2 text-center border-r border-outline-variant/20 min-w-[80px]"
               >
-                <div className="flex items-center gap-1">
-                  <input
-                    type="time"
-                    value={col}
-                    onChange={(e) => updateColumn(idx, e.target.value)}
-                    aria-label={`Tid för kolumn ${idx + 1}`}
-                    className={inputBase}
-                  />
-                  {timeColumns.length > 1 && (
+                <div className="flex items-center justify-center gap-1">
+                  <span className="text-on-surface-variant font-medium">
+                    {label}
+                  </span>
+                  {columnLabels.length > 1 && (
                     <button
                       type="button"
-                      onClick={() => removeColumn(idx)}
-                      aria-label={`Ta bort kolumn ${idx + 1}`}
-                      className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-error hover:bg-error-container transition-colors"
+                      onClick={() => onRemoveColumn(idx)}
+                      aria-label={`Ta bort kolumn ${label}`}
+                      className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-error hover:bg-error-container transition-colors"
                     >
-                      <MdDelete size={14} />
+                      <MdDelete size={12} />
                     </button>
                   )}
                 </div>
@@ -215,7 +166,7 @@ export default function SectionBuilder({
             <th className="bg-surface-container px-2 py-2 text-center w-10">
               <button
                 type="button"
-                onClick={addColumn}
+                onClick={onAddColumn}
                 aria-label="Lägg till tidskolumn"
                 className="w-7 h-7 rounded-full flex items-center justify-center text-primary border border-primary/40 hover:bg-surface-container-low transition-colors mx-auto"
               >
@@ -246,7 +197,7 @@ export default function SectionBuilder({
               >
                 {/* Span remaining columns with a subtle label */}
                 <td
-                  colSpan={timeColumns.length + 1}
+                  colSpan={columnLabels.length + 1}
                   className="px-3 py-2 text-outline border-r border-outline-variant/30"
                 >
                   <input
@@ -339,7 +290,7 @@ export default function SectionBuilder({
               {section.slots.length > 0 && (
                 <tr className="border-b border-outline-variant/20 last:border-outline-variant/40">
                   <td />
-                  <td colSpan={timeColumns.length} className="px-3 py-1.5">
+                  <td colSpan={columnLabels.length} className="px-3 py-1.5">
                     <button
                       type="button"
                       onClick={() =>
