@@ -76,13 +76,7 @@ export const timelineStages = pgTable(
       mode: 'date'
     }).notNull()
   },
-  (table) => [
-    index('idx_timeline_stages_event').on(table.eventId),
-    check(
-      'enforce_start_within_event',
-      sql`${table.startTime} >= (SELECT ${pubEvents.startTime} FROM ${pubEvents} WHERE ${pubEvents.id} = ${table.eventId}) AND ${table.startTime} <= (SELECT ${pubEvents.endTime} FROM ${pubEvents} WHERE ${pubEvents.id} = ${table.eventId})`
-    )
-  ]
+  (table) => [index('idx_timeline_stages_event').on(table.eventId)]
 );
 
 // Staff Sections

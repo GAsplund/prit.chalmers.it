@@ -39,16 +39,16 @@ jobs:
         with:
           node-version: 24
 
-      - run: yarn global add drizzle-kit@1.0.0-rc.4
+      - run: yarn global add drizzle-kit@1.0.0-rc.4 drizzle-orm@1.0.0-rc.4
 
       - name: Check migration history consistency
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testdb
-        run: yarn drizzle-kit check
+        run: drizzle-kit check
 
       - name: Check migration drift
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/testdb
         run: |
-          yarn drizzle-kit generate &&
+          drizzle-kit generate &&
           git add -N drizzle && git diff --exit-code drizzle
