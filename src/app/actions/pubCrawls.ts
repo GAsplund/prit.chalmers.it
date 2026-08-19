@@ -13,6 +13,7 @@ export async function createPubCrawl(input: PubCrawlInput) {
 
   const id = await PubCrawlService.createPubCrawl(input);
   revalidatePath('/pub-crawl');
+  revalidatePath(`/pub-crawl/${id}`);
   return id;
 }
 

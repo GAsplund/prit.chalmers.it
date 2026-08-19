@@ -1,5 +1,6 @@
 import db from '@/db';
 import {
+  importantContacts,
   pubEvents,
   timelineStages,
   staffSections,
@@ -7,7 +8,11 @@ import {
   staffSlots
 } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-import type { PubCrawlEvent, StaffSection } from '@/types/pub-crawl';
+import type {
+  ImportantContact,
+  PubCrawlEvent,
+  StaffSection
+} from '@/types/pub-crawl';
 
 type Tx = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
@@ -59,8 +64,19 @@ function toPubCrawlEvent(event: NonNullable<DbEvent>): PubCrawlEvent {
         label: stage.label,
         time: stage.startTime
       })),
+    contacts: event.contacts
+      .sort((a, b) => a.order - b.order)
+      .map((contact) => ({
+        id: contact.id,
+        name: contact.name,
+        phoneNumber: contact.phoneNumber,
+        description: contact.description ?? undefined
+      })),
     timeColumns,
-    schedule
+    schedule,
+    costs: event.lastKnownCosts,
+    revenue: event.lastKnownRevenue,
+    revenueGoal: event.revenueGoal
   };
 }
 
@@ -77,19 +93,34 @@ export interface PubCrawlInput {
     name: string;
     slots: { name: string }[][];
   }[];
+  contacts: Omit<ImportantContact, 'id'>[];
+  costs: number;
+  revenueGoal: number;
 }
 
 async function replaceChildren(tx: Tx, eventId: string, input: PubCrawlInput) {
   await tx.delete(timelineStages).where(eq(timelineStages.eventId, eventId));
   await tx.delete(staffSections).where(eq(staffSections.eventId, eventId));
+  await tx
+    .delete(importantContacts)
+    .where(eq(importantContacts.eventId, eventId));
 
-  for (const [i, phase] of input.phases.entries()) {
+  for (const phase of input.phases) {
     await tx.insert(timelineStages).values({
       id: phase.id,
       eventId,
       label: phase.label,
-      startTime: phase.time,
-      order: i
+      startTime: phase.time
+    });
+  }
+
+  for (const [contactIdx, contact] of input.contacts.entries()) {
+    await tx.insert(importantContacts).values({
+      eventId,
+      name: contact.name,
+      phoneNumber: contact.phoneNumber,
+      description: contact.description ?? null,
+      order: contactIdx
     });
   }
 
@@ -151,6 +182,7 @@ export default class PubCrawlService {
       },
       with: {
         stages: true,
+        contacts: true,
         sections: {
           with: {
             rows: {
@@ -172,7 +204,9 @@ export default class PubCrawlService {
         id: eventId,
         title: input.title,
         startTime: new Date(input.startTime),
-        endTime: new Date(input.endTime)
+        endTime: new Date(input.endTime),
+        lastKnownCosts: input.costs,
+        revenueGoal: input.revenueGoal
       });
 
       await replaceChildren(tx, eventId, input);
@@ -191,7 +225,9 @@ export default class PubCrawlService {
         .set({
           title: input.title,
           startTime: new Date(input.startTime),
-          endTime: new Date(input.endTime)
+          endTime: new Date(input.endTime),
+          lastKnownCosts: input.costs,
+          revenueGoal: input.revenueGoal
         })
         .where(eq(pubEvents.id, id));
 

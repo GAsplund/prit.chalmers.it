@@ -1,6 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import {
+  importantContacts,
   pubEvents,
   staffRows,
   staffSections,
@@ -102,34 +103,59 @@ async function seed() {
     await tx.delete(staffRows);
     await tx.delete(staffSections);
     await tx.delete(timelineStages);
+    await tx.delete(importantContacts);
 
     const [event] = await tx
       .insert(pubEvents)
       .values({
         title: 'Höstpubrunda',
         startTime: new Date(`2026-10-24T16:00:00${TZ}`),
-        endTime: new Date(`2026-10-25T02:00:00${TZ}`)
+        endTime: new Date(`2026-10-25T02:00:00${TZ}`),
+        lastKnownCosts: 25000,
+        lastKnownRevenue: 10000,
+        revenueGoal: 50000
       })
       .returning();
+
+    await tx.insert(importantContacts).values([
+      {
+        eventId: event.id,
+        name: '112',
+        phoneNumber: '112',
+        description: 'Vid nödsituation',
+        order: 0
+      },
+      {
+        eventId: event.id,
+        name: 'Cubsec',
+        phoneNumber: '031-772 44 99',
+        description: 'Ordningsvakter',
+        order: 1
+      },
+      {
+        eventId: event.id,
+        name: 'Lucas Lindberg',
+        phoneNumber: '070-123 45 67',
+        description: 'Serveringsansvarig',
+        order: 2
+      }
+    ]);
 
     await tx.insert(timelineStages).values([
       {
         eventId: event.id,
         label: 'Genomgång och slutprepp',
-        startTime: new Date(`2026-10-24T16:00:00${TZ}`),
-        order: 0
+        startTime: new Date(`2026-10-24T16:00:00${TZ}`)
       },
       {
         eventId: event.id,
         label: 'Öppet!',
-        startTime: new Date(`2026-10-24T17:31:00${TZ}`),
-        order: 1
+        startTime: new Date(`2026-10-24T17:31:00${TZ}`)
       },
       {
         eventId: event.id,
         label: 'Stängning och städ',
-        startTime: new Date(`2026-10-25T02:00:00${TZ}`),
-        order: 2
+        startTime: new Date(`2026-10-25T02:00:00${TZ}`)
       }
     ]);
 

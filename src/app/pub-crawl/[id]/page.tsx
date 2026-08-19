@@ -34,7 +34,6 @@ const navItems: NavItem[] = [
 
 const stat = {
   Icon: MdAccountBalanceWallet,
-  value: '10 000 kr',
   description: 'Resultat',
   highlight: true
 };
@@ -63,14 +62,21 @@ export default async function PubCrawlPage({
 
   const event = toPubCrawlEvent(dbEvent);
 
+  const revenuePercentage =
+    event.revenueGoal > 0 ? (event.revenue / event.revenueGoal) * 100 : 0;
+
   return (
     <>
       <main className="w-full mx-auto px-md pb-32 pt-nav-height max-w-content">
         <div className="py-gutter flex flex-col gap-md">
           {/* Page header card with event schedule */}
-          <Card as="section" size="lg" className="relative overflow-hidden">
-            <div className="flex justify-between items-start mb-lg">
-              <div>
+          <Card
+            as="section"
+            size="lg"
+            className="relative overflow-hidden grid gap-x-4 gap-y-6 [grid-template-areas:'header'_'progress'_'schedule'_'contacts'] lg:[grid-template-areas:'header_header_header'_'progress_contacts_contacts'_'schedule_schedule_schedule']"
+          >
+            <div className="[grid-area:header] mb-6 flex items-start justify-between gap-4 min-w-0">
+              <div className="min-w-0 flex-1">
                 <Link
                   href="/pub-crawl"
                   className="flex items-center gap-2 text-label-md text-on-surface-variant hover:text-primary transition-colors w-fit mb-sm"
@@ -78,94 +84,66 @@ export default async function PubCrawlPage({
                   <MdArrowBack size={18} />
                   Tillbaka till pubrundor
                 </Link>
-                <h1 className="text-headline-xl relative z-10 text-on-surface">
+                <h1 className="text-headline-xl relative z-10 text-on-surface break-words">
                   {event.title}
                 </h1>
               </div>
               <Link
                 href={`/pub-crawl/${id}/edit`}
-                className="flex items-center gap-2 px-5 px-6 py-2.5 rounded-full text-label-md bg-primary text-on-primary hover:opacity-90 transition-opacity"
+                className="flex items-center gap-2 px-6 py-2.5 rounded-full text-label-md bg-primary text-on-primary hover:opacity-90 transition-opacity flex-shrink-0"
               >
                 <MdEdit size={20} />
                 Redigera
               </Link>
             </div>
 
-            <div className="flex gap-4 mb-6 h-70">
+            <div className="[grid-area:progress] h-70 flex">
               <PubCrawlProgress phases={event.phases} endTime={event.endTime} />
-              <Card
-                variant="surface"
-                size="md"
-                className="flex-2 min-h-0 flex flex-col"
-              >
-                <div className="flex gap-3 items-center mb-2">
-                  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-surface-container text-secondary">
-                    <MdGroup size={20} />
-                  </div>
-                  <h2 className="text-headline-md text-on-surface">
-                    Viktiga kontakter
-                  </h2>
-                </div>
-                <div className="grid grid-cols-1 lg:grid-cols-2 content-start gap-2 overflow-y-auto min-h-0 flex-1">
-                  <Card
-                    size="chip"
-                    variant="surface-variant"
-                    className="flex flex-row gap-2 justify-between items-center flex"
-                  >
-                    <div>
-                      <h2 className="font-semibold">112</h2>
-                      <p className="text-label-sm text-on-surface-variant">
-                        Vid nödsituation
-                      </p>
-                    </div>
-                    <Link
-                      href="tel:112"
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-primary border border-primary/40 hover:bg-surface-container-low transition-colors"
-                    >
-                      <MdPhone size={16} />
-                    </Link>
-                  </Card>
-                  <Card
-                    size="chip"
-                    variant="surface-variant"
-                    className="flex flex-row gap-2 justify-between items-center"
-                  >
-                    <div>
-                      <h2 className="font-semibold">Cubsec</h2>
-                      <p className="text-label-sm text-on-surface-variant">
-                        Ordningsvakter
-                      </p>
-                    </div>
-                    <Link
-                      href="tel:031-772 44 99"
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-primary border border-primary/40 hover:bg-surface-container-low transition-colors"
-                    >
-                      <MdPhone size={16} />
-                    </Link>
-                  </Card>
-                  <Card
-                    size="chip"
-                    variant="surface-variant"
-                    className="flex flex-row gap-2 justify-between items-center"
-                  >
-                    <div>
-                      <h2 className="font-semibold">Linus Ordal (Skaut)</h2>
-                      <p className="text-label-sm text-on-surface-variant">
-                        Serveringsansvarig
-                      </p>
-                    </div>
-                    <Link
-                      href="tel:070-123 45 67"
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-primary border border-primary/40 hover:bg-surface-container-low transition-colors"
-                    >
-                      <MdPhone size={16} />
-                    </Link>
-                  </Card>
-                </div>
-              </Card>
             </div>
 
-            <UpcomingSchedule phases={event.phases} />
+            <div className="[grid-area:schedule] min-w-0">
+              <UpcomingSchedule phases={event.phases} />
+            </div>
+
+            <Card
+              variant="surface"
+              size="md"
+              className="[grid-area:contacts] lg:h-70 min-h-0 flex flex-col"
+            >
+              <div className="flex gap-3 items-center mb-2">
+                <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-surface-container text-secondary">
+                  <MdGroup size={20} />
+                </div>
+                <h2 className="text-headline-md text-on-surface">
+                  Viktiga kontakter
+                </h2>
+              </div>
+              <div className="grid grid-cols-1 lg:grid-cols-2 content-start gap-2 overflow-y-auto min-h-0 flex-1">
+                {event.contacts.map((contact) => (
+                  <Card
+                    key={contact.id}
+                    size="chip"
+                    variant="surface-variant"
+                    className="flex flex-row gap-2 justify-between items-center"
+                  >
+                    <div>
+                      <h2 className="font-semibold">{contact.name}</h2>
+                      {contact.description && (
+                        <p className="text-label-sm text-on-surface-variant">
+                          {contact.description}
+                        </p>
+                      )}
+                    </div>
+                    <Link
+                      href={`tel:${contact.phoneNumber}`}
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-primary border border-primary/40 hover:bg-surface-container-low transition-colors"
+                    >
+                      <MdPhone size={16} />
+                    </Link>
+                  </Card>
+                ))}
+              </div>
+            </Card>
           </Card>
 
           {/* Schedule Grid */}
@@ -211,7 +189,7 @@ export default async function PubCrawlPage({
                     Intäkter
                   </p>
                   <h2 className="text-headline-lg text-on-surface">
-                    10 000 kr
+                    {event.revenue} kr
                   </h2>
                 </div>
                 <div className="flex-1">
@@ -219,7 +197,7 @@ export default async function PubCrawlPage({
                     Kostnader
                   </p>
                   <h2 className="text-headline-lg text-on-surface">
-                    25 000 kr
+                    {event.costs} kr
                   </h2>
                 </div>
               </div>
@@ -227,16 +205,23 @@ export default async function PubCrawlPage({
               {/* Progress */}
               <div className="flex justify-between mb-2">
                 <p className="text-body-md font-body text-outline">
-                  Mål: 50 000 kr
+                  Mål: {event.revenueGoal} kr
                 </p>
-                <p className="text-body-md font-body text-outline">90% nått</p>
+                <p className="text-body-md font-body text-outline">
+                  {Math.round(revenuePercentage)}% nått
+                </p>
               </div>
               <div className="w-full h-4 rounded-full overflow-hidden bg-surface-container">
-                <div className="bg-primary h-full rounded-full transition-all duration-1000 ease-out w-[90%]" />
+                <div
+                  className="bg-primary h-full rounded-full transition-all duration-1000 ease-out w-[90%]"
+                  style={{
+                    width: `${revenuePercentage}%`
+                  }}
+                />
               </div>
             </Card>
 
-            <StatCard {...stat} />
+            <StatCard {...stat} value={`${event.revenue - event.costs} kr`} />
           </div>
         </div>
       </main>

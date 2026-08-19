@@ -4,7 +4,14 @@ import * as schema from './schema';
 export default defineRelations(schema, (r) => ({
   pubEvents: {
     stages: r.many.timelineStages(),
-    sections: r.many.staffSections()
+    sections: r.many.staffSections(),
+    contacts: r.many.importantContacts()
+  },
+  importantContacts: {
+    event: r.one.pubEvents({
+      from: [r.importantContacts.eventId],
+      to: [r.pubEvents.id]
+    })
   },
   timelineStages: {
     event: r.one.pubEvents({

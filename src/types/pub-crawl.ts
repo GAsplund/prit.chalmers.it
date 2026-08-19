@@ -23,6 +23,13 @@ export interface StaffSection {
   slots: StaffSlot[][];
 }
 
+export interface ImportantContact {
+  id: string;
+  name: string;
+  phoneNumber: string;
+  description?: string;
+}
+
 export interface PubCrawlEvent {
   id: string;
   title: string;
@@ -37,6 +44,14 @@ export interface PubCrawlEvent {
   timeColumns: Date[];
   /** Staff schedule sections (Släpp, Bar, Kök …) */
   schedule: StaffSection[];
+  /** Ordered list of important contacts (112, security, etc.) */
+  contacts: ImportantContact[];
+  /** Last known costs for the event (in SEK) */
+  costs: number;
+  /** Last known revenue for the event (in SEK) */
+  revenue: number;
+  /** Revenue goal for the event (in SEK) */
+  revenueGoal: number;
 }
 
 // ─── Mock data ────────────────────────────────────────────────────────────────
@@ -48,6 +63,9 @@ export const MOCK_EVENTS: PubCrawlEvent[] = [
     startTime: new Date('2026-10-24T16:00'),
     endTime: new Date('2026-10-25T07:00'),
     upcoming: true,
+    costs: 10000,
+    revenue: 45000,
+    revenueGoal: 50000,
     phases: [
       {
         id: 'p1',
@@ -67,6 +85,26 @@ export const MOCK_EVENTS: PubCrawlEvent[] = [
       new Date('2026-10-24T21:00'),
       new Date('2026-10-24T22:00'),
       new Date('2026-10-24T23:00')
+    ],
+    contacts: [
+      {
+        id: 'c1',
+        name: '112',
+        phoneNumber: '112',
+        description: 'Vid nödsituation'
+      },
+      {
+        id: 'c2',
+        name: 'Cubsec',
+        phoneNumber: '031-772 44 99',
+        description: 'Ordningsvakter'
+      },
+      {
+        id: 'c3',
+        name: 'Lucas Lindberg',
+        phoneNumber: '070-123 45 67',
+        description: 'Serveringsansvarig'
+      }
     ],
     schedule: [
       {
@@ -133,6 +171,9 @@ export const MOCK_EVENTS: PubCrawlEvent[] = [
     startTime: new Date('2026-11-12T10:00'),
     endTime: new Date('2026-11-12T15:00'),
     upcoming: false,
+    costs: 5000,
+    revenue: 20000,
+    revenueGoal: 25000,
     phases: [
       { id: 'p1', label: 'Förberedelse', time: new Date('2026-11-12T10:00') },
       { id: 'p2', label: 'Städning', time: new Date('2026-11-12T11:00') },
@@ -144,6 +185,14 @@ export const MOCK_EVENTS: PubCrawlEvent[] = [
       new Date('2026-11-12T12:00'),
       new Date('2026-11-12T13:00'),
       new Date('2026-11-12T14:00')
+    ],
+    contacts: [
+      {
+        id: 'c1',
+        name: '112',
+        phoneNumber: '112',
+        description: 'Vid nödsituation'
+      }
     ],
     schedule: [
       {

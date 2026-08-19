@@ -7,19 +7,22 @@ import {
   MdArrowBack,
   MdCalendarToday,
   MdGroup,
+  MdPhone,
   MdTimeline
 } from 'react-icons/md';
 import type {
   PubCrawlEvent,
   TimelinePhase,
   StaffSection,
-  FormTimelinePhase
+  FormTimelinePhase,
+  ImportantContact
 } from '@/types/pub-crawl';
 import { createPubCrawl, updatePubCrawl } from '@/app/actions/pubCrawls';
 import Card from '@/components/Card';
 import FormField from '@/components/ui/FormField';
 import PhaseBuilder from '@/components/ui/PhaseBuilder';
 import SectionBuilder from '@/components/ui/SectionBuilder';
+import ContactBuilder from '@/components/ui/ContactBuilder';
 import LocaleService from '@/services/localeService';
 
 interface PubCrawlFormProps {
@@ -77,6 +80,8 @@ export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
   const [endTime, setEndTime] = useState<Date>(
     initialData?.endTime ?? new Date()
   );
+  const [costs, setCosts] = useState(initialData?.costs ?? 0);
+  const [revenueGoal, setRevenueGoal] = useState(initialData?.revenueGoal ?? 0);
 
   // Schedule start time: initialized from first timeColumn or event start
   const [scheduleStartTime, setScheduleStartTime] = useState<Date>(() => {
@@ -97,6 +102,11 @@ export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
   // ── Sections (staff schedule data) ─────────────────────────────────────────
   const [sections, setSections] = useState<StaffSection[]>(
     () => initialData?.schedule ?? makeDefaultSections(DEFAULT_COLUMN_COUNT)
+  );
+
+  // ── Important contacts ──────────────────────────────────────────────────────
+  const [contacts, setContacts] = useState<ImportantContact[]>(
+    () => initialData?.contacts ?? []
   );
 
   // ── Derived: column count from sections ─────────────────────────────────────
@@ -148,12 +158,18 @@ export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
         title,
         startTime,
         endTime,
+        costs,
+        revenueGoal,
         phases: convPhases,
         timeColumns,
         schedule: sections.map((s) => ({
           id: s.id,
           name: s.name,
           slots: s.slots
+        })),
+        contacts: contacts.map(({ description, ...rest }) => ({
+          ...rest,
+          description: description && description.trim() ? description.trim() : undefined
         }))
       };
 
@@ -229,6 +245,27 @@ export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
           value={LocaleService.dateToInputString(endTime)}
           onChange={(e) => setEndTime(LocaleService.inputStringToDate(e.target.value))}
         />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-md">
+          <FormField
+            id="event-costs"
+            label="Kostnader"
+            type="number"
+            min={0}
+            step="1"
+            value={costs}
+            onChange={(e) => setCosts(Number(e.target.value) || 0)}
+          />
+          <FormField
+            id="event-revenue-goal"
+            label="Intäktsmål"
+            type="number"
+            min={0}
+            step="1"
+            value={revenueGoal}
+            onChange={(e) => setRevenueGoal(Number(e.target.value) || 0)}
+          />
+        </div>
       </Card>
 
       {/* ── Card 2: Timeline phases ───────────────────────────────────────── */}
@@ -243,7 +280,21 @@ export default function PubCrawlForm({ initialData }: PubCrawlFormProps) {
         <PhaseBuilder phases={phases} onChange={setPhases} />
       </Card>
 
-      {/* ── Card 3: Staff schedule ────────────────────────────────────────── */}
+      {/* ── Card 3: Important contacts ────────────────────────────────────── */}
+      <Card size="lg" className="flex flex-col gap-md">
+        <div className="flex items-center gap-3 mb-sm">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container text-secondary flex-shrink-0">
+            <MdPhone size={20} />
+          </div>
+          <h2 className="text-headline-md text-on-surface">
+            Viktiga kontakter
+          </h2>
+        </div>
+
+        <ContactBuilder contacts={contacts} onChange={setContacts} />
+      </Card>
+
+      {/* ── Card 4: Staff schedule ────────────────────────────────────────── */}
       <Card size="lg" className="flex flex-col gap-md">
         <div className="flex items-center gap-3 mb-sm">
           <div className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container text-secondary flex-shrink-0">

@@ -31,7 +31,10 @@ export const pubEvents = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .defaultNow()
-      .$onUpdate(() => new Date())
+      .$onUpdate(() => new Date()),
+    revenueGoal: integer('revenue_goal').notNull().default(0),
+    lastKnownRevenue: integer('last_known_revenue').notNull().default(0),
+    lastKnownCosts: integer('last_known_costs').notNull().default(0)
   },
   (table) => [
     check(
@@ -39,6 +42,23 @@ export const pubEvents = pgTable(
       sql`${table.startTime} < ${table.endTime}`
     )
   ]
+);
+
+// Important Contacts
+
+export const importantContacts = pgTable(
+  'important_contacts',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    eventId: uuid('event_id')
+      .notNull()
+      .references(() => pubEvents.id, { onDelete: 'cascade' }),
+    name: text('name').notNull(),
+    phoneNumber: text('phone_number').notNull(),
+    description: text('description'),
+    order: integer('order').notNull()
+  },
+  (table) => [unique('uniq_event_contact_order').on(table.eventId, table.order)]
 );
 
 // Timeline Stages
@@ -54,8 +74,7 @@ export const timelineStages = pgTable(
     startTime: timestamp('start_time', {
       withTimezone: true,
       mode: 'date'
-    }).notNull(),
-    order: integer('order').notNull()
+    }).notNull()
   },
   (table) => [
     index('idx_timeline_stages_event').on(table.eventId),
