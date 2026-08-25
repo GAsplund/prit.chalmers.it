@@ -61,68 +61,70 @@ export default function ScheduleTable({
         </select>
       </div>
 
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="border-b border-surface-variant">
-            {timeColumns.map((col, colIdx) => (
-              <th
-                key={col.getTime()}
-                className={`text-label-md text-center p-sm transition-colors ${
-                  colIdx === activeColumnIndex
-                    ? 'bg-primary/10 text-primary font-semibold'
-                    : 'text-on-surface-variant'
-                }`}
-              >
-                {col.toLocaleTimeString(['sv-SE'], {
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody className="divide-y">
-          {schedule.map((section) => (
-            <React.Fragment key={section.id}>
-              <tr>
-                <td
-                  colSpan={timeColumns.length}
-                  className="text-headline-sm text-center font-bold p-xs sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant font-headline"
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b border-surface-variant">
+              {timeColumns.map((col, colIdx) => (
+                <th
+                  key={col.getTime()}
+                  className={`text-label-md text-center p-sm transition-colors ${
+                    colIdx === activeColumnIndex
+                      ? 'bg-primary/10 text-primary font-semibold'
+                      : 'text-on-surface-variant'
+                  }`}
                 >
-                  {section.name}
-                </td>
-              </tr>
-              {section.slots.map((row, rIdx) => (
-                <tr
-                  key={`${section.id}-row-${rIdx}`}
-                  className="border-surface-variant hover:bg-surface-container/50 transition-colors divide-x"
-                >
-                  {row.map((slot, cIdx) => {
-                    const isSelected =
-                      selectedUser && slot.name === selectedUser;
-                    const isActiveColumn = cIdx === activeColumnIndex;
-
-                    return (
-                      <td
-                        key={`${section.id}-${rIdx}-${cIdx}`}
-                        className={`text-center border-surface-variant p-sm text-label-sm transition-colors ${
-                          isSelected
-                            ? 'bg-primary-container text-on-primary-container font-semibold'
-                            : isActiveColumn
-                              ? 'bg-primary/5'
-                              : ''
-                        } ${slot.name ? '' : 'text-on-surface-variant italic'}`}
-                      >
-                        {slot.name || 'Ej tilldelad'}
-                      </td>
-                    );
+                  {col.toLocaleTimeString(['sv-SE'], {
+                    hour: '2-digit',
+                    minute: '2-digit'
                   })}
-                </tr>
+                </th>
               ))}
-            </React.Fragment>
-          ))}
-        </tbody>
-      </table>
+            </tr>
+          </thead>
+          <tbody className="divide-y">
+            {schedule.map((section) => (
+              <React.Fragment key={section.id}>
+                <tr>
+                  <td
+                    colSpan={timeColumns.length}
+                    className="text-headline-sm text-center font-bold p-xs sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant font-headline"
+                  >
+                    {section.name}
+                  </td>
+                </tr>
+                {section.slots.map((row, rIdx) => (
+                  <tr
+                    key={`${section.id}-row-${rIdx}`}
+                    className="border-surface-variant hover:bg-surface-container/50 transition-colors divide-x"
+                  >
+                    {row.map((slot, cIdx) => {
+                      const isSelected =
+                        selectedUser && slot.name === selectedUser;
+                      const isActiveColumn = cIdx === activeColumnIndex;
+
+                      return (
+                        <td
+                          key={`${section.id}-${rIdx}-${cIdx}`}
+                          className={`text-center border-surface-variant p-sm text-label-sm transition-colors ${
+                            isSelected
+                              ? 'bg-primary-container text-on-primary-container font-semibold'
+                              : isActiveColumn
+                                ? 'bg-primary/5'
+                                : ''
+                          } ${slot.name ? '' : 'text-on-surface-variant italic'}`}
+                        >
+                          {slot.name || 'Ej tilldelad'}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

@@ -41,12 +41,13 @@ export default async function PubCrawlPage() {
   const isPRIT = await UserService.getIsPRIT();
   if (!isPRIT) return <ForbiddenPage />;
 
-  const activeEvent = MOCK_EVENTS.find((e) => e.upcoming);
+  const activeEvent = (await PubCrawlService.getOngoingPubCrawls()).at(0);
   const upcomingEvents = await PubCrawlService.getUpcomingPubCrawls();
+  const pastEvents = await PubCrawlService.getPastPubCrawls();
 
   return (
     <>
-      <main className="w-full mx-auto px-md pb-32 pt-[88px] content-container">
+      <main className="w-full mx-auto px-sm sm:px-md pb-32 pt-[88px] content-container">
         {/* Ongoing event banner */}
         {activeEvent && (
           <Card
@@ -107,7 +108,14 @@ export default async function PubCrawlPage() {
               Nytt event
             </Link>
           </div>
+          <h2 className="text-title-lg text-on-surface mb-2">
+            Kommande pubrundor
+          </h2>
           <EventList events={upcomingEvents} />
+          <h2 className="text-title-lg text-on-surface mb-2 mt-8">
+            Tidigare pubrundor
+          </h2>
+          <EventList events={pastEvents} />
         </Card>
       </main>
 

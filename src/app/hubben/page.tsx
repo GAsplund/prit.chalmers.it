@@ -20,7 +20,7 @@ export default async function PubCrawlPage() {
 
   return (
     <>
-      <main className="w-full mx-auto px-md pb-32 pt-nav-height max-w-content">
+      <main className="w-full mx-auto px-sm sm:px-md pb-32 pt-nav-height max-w-content">
         <div className="py-gutter flex flex-col gap-md">
           {/* Page header card */}
           <Card as="section" size="lg">

@@ -16,7 +16,7 @@ interface EventCardActionsProps {
  */
 export default function EventCardActions({ id, title, onDelete }: EventCardActionsProps) {
   return (
-    <div className="opacity-0 group-hover:opacity-100 transition-opacity pr-1 flex-shrink-0 flex items-center gap-1">
+    <div className="opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 transition-opacity pr-1 flex-shrink-0 flex items-center gap-1">
       <Link
         href={`/pub-crawl/${id}/edit`}
         aria-label={`Redigera ${title}`}

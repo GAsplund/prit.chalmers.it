@@ -162,15 +162,44 @@ async function replaceChildren(tx: Tx, eventId: string, input: PubCrawlInput) {
 }
 
 export default class PubCrawlService {
-  static async getUpcomingPubCrawls() {
+  static async getOngoingPubCrawls() {
     return db.query.pubEvents.findMany({
       where: {
         startTime: {
+          lte: new Date()
+        },
+        endTime: {
           gte: new Date()
         }
       },
       orderBy: {
         startTime: 'asc'
+      }
+    });
+  }
+
+  static async getUpcomingPubCrawls() {
+    return db.query.pubEvents.findMany({
+      where: {
+        endTime: {
+          gte: new Date()
+        }
+      },
+      orderBy: {
+        startTime: 'asc'
+      }
+    });
+  }
+
+  static async getPastPubCrawls() {
+    return db.query.pubEvents.findMany({
+      where: {
+        endTime: {
+          lt: new Date()
+        }
+      },
+      orderBy: {
+        startTime: 'desc'
       }
     });
   }
@@ -232,6 +261,12 @@ export default class PubCrawlService {
         .where(eq(pubEvents.id, id));
 
       await replaceChildren(tx, id, input);
+    });
+  }
+
+  static async deletePubCrawl(id: string): Promise<void> {
+    await db.transaction(async (tx) => {
+      await tx.delete(pubEvents).where(eq(pubEvents.id, id));
     });
   }
 }

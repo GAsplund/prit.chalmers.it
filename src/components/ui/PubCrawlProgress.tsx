@@ -57,6 +57,19 @@ export default function PubCrawlProgress({
     return Math.max(0, new Date(phases[0].time).getTime() - now.getTime());
   }, [phases, now]);
 
+  const formatTimeUntil = (ms: number) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    if (days > 0) {
+      return `${days}:${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+    }
+    return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
+  };
+
   return (
     <Card
       variant="surface"
@@ -114,7 +127,7 @@ export default function PubCrawlProgress({
               className="text-body-md text-on-primary-container truncate"
               suppressHydrationWarning
             >
-              {new Date(timeUntilStart).toISOString().slice(11, 19)}
+              {formatTimeUntil(timeUntilStart)}
             </p>
           )}
           <div className="relative w-22 h-22 flex items-center justify-center">

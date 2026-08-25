@@ -67,7 +67,7 @@ export default async function PubCrawlPage({
 
   return (
     <>
-      <main className="w-full mx-auto px-md pb-32 pt-nav-height max-w-content">
+      <main className="w-full mx-auto px-sm sm:px-md pb-32 pt-nav-height max-w-content">
         <div className="py-gutter flex flex-col gap-md">
           {/* Page header card with event schedule */}
           <Card
@@ -75,7 +75,7 @@ export default async function PubCrawlPage({
             size="lg"
             className="relative overflow-hidden grid gap-x-4 gap-y-6 [grid-template-areas:'header'_'progress'_'schedule'_'contacts'] lg:[grid-template-areas:'header_header_header'_'progress_contacts_contacts'_'schedule_schedule_schedule']"
           >
-            <div className="[grid-area:header] mb-6 flex items-start justify-between gap-4 min-w-0">
+            <div className="[grid-area:header] mb-6 flex flex-col md:flex-row items-start md:justify-between gap-4 min-w-0">
               <div className="min-w-0 flex-1">
                 <Link
                   href="/pub-crawl"
@@ -84,7 +84,7 @@ export default async function PubCrawlPage({
                   <MdArrowBack size={18} />
                   Tillbaka till pubrundor
                 </Link>
-                <h1 className="text-headline-xl relative z-10 text-on-surface break-words">
+                <h1 className="text-headline-xl relative z-10 text-on-surface break-all">
                   {event.title}
                 </h1>
               </div>
@@ -166,7 +166,7 @@ export default async function PubCrawlPage({
 
           {/* Financial health grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-            <Card className="flex flex-col justify-between col-start-1 col-end-3">
+            <Card className="flex flex-col justify-between md:col-start-1 md:col-end-3">
               {/* Header row */}
               <div className="flex justify-between items-start mb-6">
                 <div className="flex gap-3 items-center">

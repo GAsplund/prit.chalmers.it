@@ -26,3 +26,12 @@ export async function updatePubCrawl(id: string, input: PubCrawlInput) {
   revalidatePath('/pub-crawl');
   revalidatePath(`/pub-crawl/${id}`);
 }
+
+export async function deletePubCrawl(id: string) {
+  if (!(await UserService.getIsPRIT())) {
+    throw new Error('Unauthorized');
+  }
+
+  await PubCrawlService.deletePubCrawl(id);
+  revalidatePath('/pub-crawl');
+}

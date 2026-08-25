@@ -29,7 +29,7 @@ const variantClasses: Record<CardVariant, string> = {
 const sizeClasses: Record<CardSize, string> = {
   sm: 'rounded-2xl p-sm',
   md: 'rounded-xl p-md',
-  lg: 'rounded-lg p-lg',
+  lg: 'rounded-lg p-md md:p-lg',
   chip: 'rounded-full px-4 py-2'
 };
 

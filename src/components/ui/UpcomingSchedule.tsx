@@ -38,7 +38,7 @@ export default function UpcomingSchedule({ phases }: UpcomingScheduleProps) {
           className="flex items-center gap-2 px-3 py-2 rounded-full text-label-sm bg-surface-container-low text-on-surface-variant hover:bg-surface-container transition-colors cursor-pointer"
         >
           <MdOpenInFull size={16} />
-          Se hela schemat
+          <span className="hidden sm:block">Se hela schemat</span>
         </button>
       </div>
 

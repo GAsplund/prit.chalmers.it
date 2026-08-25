@@ -36,7 +36,7 @@ export default async function EditPubCrawlPage({
 
   return (
     <>
-      <main className="w-full mx-auto px-md pb-32 pt-[88px] content-container">
+      <main className="w-full mx-auto px-sm sm:px-md pb-32 pt-[88px] content-container">
         <div className="py-gutter">
           <PubCrawlForm initialData={event} />
         </div>

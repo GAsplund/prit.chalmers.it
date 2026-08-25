@@ -4,6 +4,7 @@ import { useState } from 'react';
 import EventCard from '@/components/EventCard';
 import DeleteConfirmDialog from '@/components/ui/DeleteConfirmDialog';
 import PubCrawlService from '@/services/pubCrawlService';
+import { deletePubCrawl } from '@/app/actions/pubCrawls';
 
 interface EventListProps {
   events: Awaited<ReturnType<typeof PubCrawlService.getUpcomingPubCrawls>>;
@@ -38,10 +39,18 @@ export default function EventList({ events }: EventListProps) {
     setDeleteTarget({ id, title });
   }
 
-  function handleDeleteConfirm() {
-    // TODO: call server action to delete event with deleteTarget.id
-    console.log('delete', deleteTarget?.id);
+  async function handleDeleteConfirm() {
+    if (!deleteTarget) return;
+    await deletePubCrawl(deleteTarget!.id);
     setDeleteTarget(null);
+  }
+
+  if (events.length === 0) {
+    return (
+      <p className="text-on-surface-variant text-body-md">
+        Inga pubrundor att visa.
+      </p>
+    );
   }
 
   return (
