@@ -24,6 +24,7 @@ import { notFound } from 'next/navigation';
 import PubCrawlProgress from '@/components/ui/PubCrawlProgress';
 import UpcomingSchedule from '@/components/ui/UpcomingSchedule';
 import ScheduleTable from '@/components/ui/ScheduleTable';
+import GammaService from '@/services/gammaService';
 
 const navItems: NavItem[] = [
   { href: '/', Icon: MdHome, label: 'Hem' },
@@ -64,6 +65,10 @@ export default async function PubCrawlPage({
 
   const revenuePercentage =
     event.revenueGoal > 0 ? (event.revenue / event.revenueGoal) * 100 : 0;
+
+  const nick = user.externalId
+    ? await GammaService.getNick(user.externalId)
+    : undefined;
 
   return (
     <>
@@ -161,6 +166,7 @@ export default async function PubCrawlPage({
               timeColumns={event.timeColumns}
               schedule={event.schedule}
               eventEndTime={event.endTime}
+              currentUserName={nick}
             />
           </Card>
 
