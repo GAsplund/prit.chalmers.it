@@ -16,8 +16,6 @@ import {
   MdGroup
 } from 'react-icons/md';
 import UserService from '@/services/userService';
-import UnauthorizedPage from '@/components/ErrorPages/401';
-import ForbiddenPage from '@/components/ErrorPages/403';
 import Link from 'next/link';
 import PubCrawlService, { toPubCrawlEvent } from '@/services/pubCrawlService';
 import { notFound } from 'next/navigation';
@@ -46,27 +44,19 @@ export default async function PubCrawlPage({
 }) {
   const { id } = await params;
 
-  const user = await UserService.getUser();
-  if (!user) {
-    return <UnauthorizedPage />;
-  }
-
-  const isPRIT = await UserService.getIsPRIT();
-  if (!isPRIT) {
-    return <ForbiddenPage />;
-  }
-
   const dbEvent = await PubCrawlService.getPubCrawlById(id);
   if (!dbEvent) {
     notFound();
   }
-
   const event = toPubCrawlEvent(dbEvent);
+
+  const user = await UserService.getUser();
+  const isPRIT = await UserService.getIsPRIT();
 
   const revenuePercentage =
     event.revenueGoal > 0 ? (event.revenue / event.revenueGoal) * 100 : 0;
 
-  const nick = user.externalId
+  const nick = user?.externalId
     ? await GammaService.getNick(user.externalId)
     : undefined;
 
@@ -82,24 +72,28 @@ export default async function PubCrawlPage({
           >
             <div className="[grid-area:header] mb-6 flex flex-col md:flex-row items-start md:justify-between gap-4 min-w-0">
               <div className="min-w-0 flex-1">
-                <Link
-                  href="/pub-crawl"
-                  className="flex items-center gap-2 text-label-md text-on-surface-variant hover:text-primary transition-colors w-fit mb-sm"
-                >
-                  <MdArrowBack size={18} />
-                  Tillbaka till pubrundor
-                </Link>
+                {isPRIT && (
+                  <Link
+                    href="/pub-crawl"
+                    className="flex items-center gap-2 text-label-md text-on-surface-variant hover:text-primary transition-colors w-fit mb-sm"
+                  >
+                    <MdArrowBack size={18} />
+                    Tillbaka till pubrundor
+                  </Link>
+                )}
                 <h1 className="text-headline-xl relative z-10 text-on-surface break-all">
                   {event.title}
                 </h1>
               </div>
-              <Link
-                href={`/pub-crawl/${id}/edit`}
-                className="flex items-center gap-2 px-6 py-2.5 rounded-full text-label-md bg-primary text-on-primary hover:opacity-90 transition-opacity flex-shrink-0"
-              >
-                <MdEdit size={20} />
-                Redigera
-              </Link>
+              {isPRIT && (
+                <Link
+                  href={`/pub-crawl/${id}/edit`}
+                  className="flex items-center gap-2 px-6 py-2.5 rounded-full text-label-md bg-primary text-on-primary hover:opacity-90 transition-opacity flex-shrink-0"
+                >
+                  <MdEdit size={20} />
+                  Redigera
+                </Link>
+              )}
             </div>
 
             <div className="[grid-area:progress] h-70 flex">
