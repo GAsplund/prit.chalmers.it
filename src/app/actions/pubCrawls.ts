@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import PubCrawlService, {
   type PubCrawlInput
 } from '@/services/pubCrawlService';
+import ZettleService from '@/services/zettleService';
 import UserService from '@/services/userService';
 
 export async function createPubCrawl(input: PubCrawlInput) {
@@ -34,4 +35,14 @@ export async function deletePubCrawl(id: string) {
 
   await PubCrawlService.deletePubCrawl(id);
   revalidatePath('/pub-crawl');
+}
+
+export async function updateRevenueFromZettle(id: string) {
+  if (!(await UserService.getIsPRIT())) {
+    throw new Error('Unauthorized');
+  }
+
+  const revenue = await ZettleService.updateRevenueFromZettle(id);
+  revalidatePath(`/pub-crawl/${id}`);
+  return revenue;
 }

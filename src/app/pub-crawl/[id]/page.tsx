@@ -22,6 +22,7 @@ import { notFound } from 'next/navigation';
 import PubCrawlProgress from '@/components/ui/PubCrawlProgress';
 import UpcomingSchedule from '@/components/ui/UpcomingSchedule';
 import ScheduleTable from '@/components/ui/ScheduleTable';
+import RefreshRevenueButton from '@/components/ui/RefreshRevenueButton';
 import GammaService from '@/services/gammaService';
 
 const navItems: NavItem[] = [
@@ -175,11 +176,14 @@ export default async function PubCrawlPage({
                   </div>
                   <h2 className="text-headline-md text-on-surface">Ekonomi</h2>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-container">
-                  <span className="w-2 h-2 rounded-full bg-on-primary-container animate-pulse flex-shrink-0" />
-                  <span className="text-label-sm text-on-secondary-container">
-                    Live
-                  </span>
+                <div className="flex flex-col gap-1 items-end">
+                  <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-secondary-container">
+                    <span className="w-2 h-2 rounded-full bg-on-primary-container animate-pulse flex-shrink-0" />
+                    <span className="text-label-sm text-on-secondary-container">
+                      Live
+                    </span>
+                  </div>
+                  {isPRIT && <RefreshRevenueButton eventId={id} />}
                 </div>
               </div>
 
