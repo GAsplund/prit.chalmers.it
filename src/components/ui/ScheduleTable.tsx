@@ -4,22 +4,25 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { MdPerson, MdTableChart, MdViewList } from 'react-icons/md';
 import type { StaffSection } from '@/types/pub-crawl';
 import LinearSchedule from './LinearSchedule';
+import { setLinearScheduleView } from '@/app/actions/cookies';
 
 interface ScheduleTableProps {
   timeColumns: Date[];
   schedule: StaffSection[];
   eventEndTime: Date;
   currentUserName?: string;
+  defaultLinearView?: boolean;
 }
 
 export default function ScheduleTable({
   timeColumns,
   schedule,
   eventEndTime,
-  currentUserName
+  currentUserName,
+  defaultLinearView = false
 }: ScheduleTableProps) {
   const [now, setNow] = useState(() => new Date());
-  const [linearView, setLinearView] = useState(false);
+  const [linearView, setLinearView] = useState(defaultLinearView);
 
   const uniqueNames = useMemo(() => {
     const names = new Set<string>();
@@ -44,6 +47,11 @@ export default function ScheduleTable({
     const interval = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
+
+  const setInternalLinearView = async (value: boolean) => {
+    await setLinearScheduleView(value);
+    setLinearView(value);
+  };
 
   const activeColumnIndex = useMemo(() => {
     return now > eventEndTime ||
@@ -74,7 +82,7 @@ export default function ScheduleTable({
         </div>
         <div className="inline-flex items-center rounded-full border border-outline-variant/20">
           <button
-            onClick={() => setLinearView(false)}
+            onClick={() => setInternalLinearView(false)}
             aria-pressed={!linearView}
             className={`inline-flex items-center gap-1.5 px-3 py-2 text-label-sm font-semibold transition-colors border-0 rounded-full cursor-pointer ${
               !linearView
@@ -86,7 +94,7 @@ export default function ScheduleTable({
             Tabell
           </button>
           <button
-            onClick={() => setLinearView(true)}
+            onClick={() => setInternalLinearView(true)}
             aria-pressed={linearView}
             className={`inline-flex items-center gap-1.5 px-3 py-2 text-label-sm font-semibold transition-colors border-0 rounded-full cursor-pointer ${
               linearView

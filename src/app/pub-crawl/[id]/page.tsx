@@ -24,6 +24,7 @@ import UpcomingSchedule from '@/components/ui/UpcomingSchedule';
 import ScheduleTable from '@/components/ui/ScheduleTable';
 import RefreshRevenueButton from '@/components/ui/RefreshRevenueButton';
 import GammaService from '@/services/gammaService';
+import { cookies } from 'next/headers';
 
 const navItems: NavItem[] = [
   { href: '/', Icon: MdHome, label: 'Hem' },
@@ -60,6 +61,10 @@ export default async function PubCrawlPage({
   const nick = user?.externalId
     ? await GammaService.getNick(user.externalId)
     : undefined;
+
+  const cookieStore = await cookies();
+  const defaultLinearView =
+    cookieStore.get('linearScheduleView')?.value === 'true';
 
   return (
     <>
@@ -162,6 +167,7 @@ export default async function PubCrawlPage({
               schedule={event.schedule}
               eventEndTime={event.endTime}
               currentUserName={nick}
+              defaultLinearView={defaultLinearView}
             />
           </Card>
 
