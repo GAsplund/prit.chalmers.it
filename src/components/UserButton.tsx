@@ -36,13 +36,12 @@ export default function UserButton({ user }: { user?: User | null }) {
     return (
       <button
         onClick={async () => {
-          // TODO: trigger real login flow
-          //setUser({ name: "Demo User", initials: "DU" });
           await authClient.signIn.oauth2({
-            providerId: 'gamma'
+            providerId: 'gamma',
+            callbackURL: window.location.pathname
           });
         }}
-        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-label-md transition-all bg-surface-container text-on-surface-variant font-semibold"
+        className="inline-flex items-center h-9 gap-1.5 px-4 py-1.5 rounded-full text-label-md transition-all bg-surface-container text-on-surface-variant font-semibold cursor-pointer"
       >
         <MdLogin size={16} />
         Logga in
@@ -57,7 +56,7 @@ export default function UserButton({ user }: { user?: User | null }) {
         onClick={() => setOpen((o) => !o)}
         aria-label="Användarmeny"
         aria-expanded={open}
-        className="w-9 h-9 rounded-full flex items-center justify-center text-label-sm font-bold transition-all bg-primary-container text-on-primary-container"
+        className="w-9 h-9 rounded-full flex items-center justify-center text-label-sm font-bold transition-all bg-primary-container text-on-primary-container cursor-pointer"
       >
         <img
           src={
@@ -76,7 +75,7 @@ export default function UserButton({ user }: { user?: User | null }) {
               await authClient.signOut();
               router.refresh();
             }}
-            className="w-full flex items-center gap-2 px-4 py-2 text-label-md transition-colors hover:opacity-80 text-on-surface-variant"
+            className="w-full flex items-center gap-2 px-4 py-2 text-label-md transition-colors hover:opacity-80 text-on-surface-variant cursor-pointer"
           >
             <MdLogout size={16} />
             Logga ut
