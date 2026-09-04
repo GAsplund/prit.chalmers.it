@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { MdPerson, MdViewList } from 'react-icons/md';
+import { MdPerson, MdTableChart, MdViewList } from 'react-icons/md';
 import type { StaffSection } from '@/types/pub-crawl';
 import LinearSchedule from './LinearSchedule';
 
@@ -55,32 +55,49 @@ export default function ScheduleTable({
 
   return (
     <>
-      <div className="flex items-center gap-3 mb-4">
-        <MdPerson size={20} className="text-on-surface-variant" />
-        <select
-          autoComplete="off"
-          value={selectedUser}
-          onChange={(e) => setSelectedUser(e.target.value)}
-          className="px-3 py-2 rounded-full text-label-sm bg-surface-container-low text-on-surface-variant border border-outline-variant/20 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
-        >
-          <option value="">Ingen</option>
-          {uniqueNames.map((name) => (
-            <option key={name} value={name}>
-              {name}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={() => setLinearView((v) => !v)}
-          className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-label-sm font-semibold transition-colors border ${
-            linearView
-              ? 'bg-primary-container text-on-primary-container border-primary/40'
-              : 'bg-surface-container-low text-on-surface-variant border-outline-variant/20 hover:bg-surface-container'
-          }`}
-        >
-          <MdViewList size={16} />
-          Visa som lista
-        </button>
+      <div className="flex flex-col items-start sm:items-center sm:justify-between sm:flex-row gap-3 mb-4">
+        <div className="flex items-center gap-2">
+          <MdPerson size={20} className="text-on-surface-variant" />
+          <select
+            autoComplete="off"
+            value={selectedUser}
+            onChange={(e) => setSelectedUser(e.target.value)}
+            className="px-3 py-2 rounded-full text-label-sm bg-surface-container-low text-on-surface-variant border border-outline-variant/20 cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary"
+          >
+            <option value="">Ingen</option>
+            {uniqueNames.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="inline-flex items-center rounded-full border border-outline-variant/20">
+          <button
+            onClick={() => setLinearView(false)}
+            aria-pressed={!linearView}
+            className={`inline-flex items-center gap-1.5 px-3 py-2 text-label-sm font-semibold transition-colors border-0 rounded-full cursor-pointer ${
+              !linearView
+                ? 'bg-surface-container text-on-surface-container'
+                : 'bg-transparent text-on-surface-variant'
+            } rounded-l-full`}
+          >
+            <MdTableChart size={16} />
+            Tabell
+          </button>
+          <button
+            onClick={() => setLinearView(true)}
+            aria-pressed={linearView}
+            className={`inline-flex items-center gap-1.5 px-3 py-2 text-label-sm font-semibold transition-colors border-0 rounded-full cursor-pointer ${
+              linearView
+                ? 'bg-surface-container text-on-surface-container'
+                : 'bg-transparent text-on-surface-variant'
+            } rounded-r-full`}
+          >
+            <MdViewList size={16} />
+            Lista
+          </button>
+        </div>
       </div>
 
       {linearView ? (
@@ -91,7 +108,7 @@ export default function ScheduleTable({
           selectedUser={selectedUser}
         />
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto @container">
           <table className="w-full border-collapse">
             <thead>
               <tr className="border-b border-surface-variant">
@@ -118,9 +135,11 @@ export default function ScheduleTable({
                   <tr>
                     <td
                       colSpan={timeColumns.length}
-                      className="text-headline-sm text-center font-bold p-xs sticky left-0 bg-surface-container-low z-10 border-b border-t border-surface-variant font-headline"
+                      className="bg-surface-container-low border-b border-surface-variant"
                     >
-                      {section.name}
+                      <div className="sticky left-0 w-[100cqi] text-center font-bold font-headline p-xs">
+                        {section.name}
+                      </div>
                     </td>
                   </tr>
                   {section.slots.map((row, rIdx) => (
@@ -142,9 +161,9 @@ export default function ScheduleTable({
                                 : isActiveColumn
                                   ? 'bg-primary/5'
                                   : ''
-                            } ${slot.name ? '' : 'text-on-surface-variant italic'}`}
+                            } ${slot.name ? '' : 'text-on-surface-variant'}`}
                           >
-                            {slot.name || 'Ej tilldelad'}
+                            {slot.name || '-'}
                           </td>
                         );
                       })}
